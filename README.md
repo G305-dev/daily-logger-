@@ -1,4 +1,4 @@
-# ShipLog — Starfetch Web Portal (minimal)
+# ShipLog 
 
 > 🌐 **Open access:** anyone can view this site — no login, no roles, no menus.
 
