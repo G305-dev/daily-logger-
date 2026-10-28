@@ -1,0 +1,1551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ShipLog — Daily Development Goals • Starfetch Web Portal</title>
+<style>
+:root{
+  --bg:#f6f7fb; --card:#fff; --ink:#111827; --muted:#6b7280; --line:#e5e7eb;
+  --brand:#4f46e5; --brand2:#7c3aed; --blue:#2563eb; --green:#059669; --amber:#d97706; --red:#dc2626;
+  --radius:16px; --shadow:0 8px 30px rgba(17,24,39,.07);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+a{color:var(--brand)}
+button{font-family:inherit;cursor:pointer}
+input,select,textarea{font-family:inherit}
+
+/* Layout */
+.app{display:flex;min-height:100vh}
+.sidebar{width:268px;background:#111827;color:#e5e7eb;padding:22px 16px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:14px;flex-shrink:0}
+.logo{display:flex;gap:12px;align-items:center;padding:4px 6px 14px;border-bottom:1px solid rgba(255,255,255,.12)}
+.logoMark{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--brand),var(--brand2));display:grid;place-items:center;font-size:24px}
+.logo b{font-size:20px;color:#fff;display:block;line-height:1}
+.logo span{font-size:12px;color:#9ca3af}
+.nav{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+.nav button{background:transparent;border:0;color:#d1d5db;text-align:left;padding:12px 12px;border-radius:12px;font-size:15px;display:flex;gap:10px;align-items:center}
+.nav button.active{background:#fff;color:#111827;font-weight:700}
+.nav button:hover:not(.active){background:rgba(255,255,255,.08)}
+.sideLabel{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#9ca3af;margin:14px 8px 4px}
+.devChip{display:flex;gap:10px;align-items:center;padding:10px;border-radius:12px;background:rgba(255,255,255,.06)}
+.avatar{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:800;flex-shrink:0}
+.devChip b{color:#fff;font-size:14px;display:block}
+.devChip span{font-size:12px;color:#9ca3af}
+.dot{width:9px;height:9px;border-radius:50%;margin-left:auto}
+.sideFoot{margin-top:auto;display:grid;gap:8px}
+.sideFoot button{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);color:#fff;padding:10px;border-radius:10px}
+.main{flex:1;min-width:0;padding:22px 24px 48px;max-width:1060px;margin:0 auto;width:100%}
+
+/* Header */
+.top{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;margin-bottom:16px}
+.titleBox{flex:1;min-width:260px}
+.titleBox h1{margin:0;font-size:28px;letter-spacing:-.02em}
+.titleBox p{margin:5px 0 0;color:var(--muted)}
+.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{border:1px solid var(--line);background:#fff;color:var(--ink);padding:10px 14px;border-radius:11px;font-weight:650;font-size:14px}
+.btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.green{background:var(--green);border-color:var(--green);color:#fff}
+.btn.dark{background:#111827;color:#fff;border-color:#111827}
+.btn.small{padding:7px 10px;font-size:13px;border-radius:9px}
+.btn.danger{color:var(--red)}
+.select{padding:10px 12px;border:1px solid var(--line);border-radius:11px;background:#fff;font-weight:650}
+.search{padding:11px 13px;border:1px solid var(--line);border-radius:11px;min-width:220px;background:#fff}
+
+/* Banner */
+.banner{background:linear-gradient(135deg,#eef2ff,#fdf4ff);border:1px solid #e0e7ff;padding:14px 16px;border-radius:var(--radius);display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
+.banner b{font-size:15px}
+.banner p{margin:2px 0 0;color:#4b5563;font-size:14px}
+.alerts{display:grid;gap:8px;margin-bottom:16px}
+.alert{padding:12px 14px;border-radius:12px;font-size:14px;display:flex;gap:10px;align-items:center}
+.alert.red{background:#fef2f2;border:1px solid #fecaca;color:#991b1b}
+.alert.amber{background:#fffbeb;border:1px solid #fde68a;color:#92400e}
+.alert.green{background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46}
+
+/* Cards / stats */
+.grid{display:grid;gap:14px}
+.stats{grid-template-columns:repeat(5,1fr)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
+.statCard .label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:750}
+.statCard .num{font-size:32px;font-weight:850;margin:6px 0 2px;letter-spacing:-.03em}
+.statCard .sub{font-size:13px;color:var(--muted)}
+.twoCol{grid-template-columns:1.5fr 1fr;margin-top:14px}
+.threeCol{grid-template-columns:repeat(3,1fr);margin-top:14px}
+.card h2,.card h3{margin:0 0 10px;font-size:17px}
+.card h3{font-size:15px}
+.muted{color:var(--muted)} .smallText{font-size:13px}
+.progressBar{height:12px;background:#e5e7eb;border-radius:99px;overflow:hidden}
+.progressFill{height:100%;background:linear-gradient(90deg,var(--brand),var(--brand2));border-radius:99px;transition:width .4s}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:99px;font-size:12px;font-weight:750;border:1px solid var(--line);background:#f9fafb;white-space:nowrap}
+.badge.high,.badge.urgent{background:#fef2f2;color:#b91c1c;border-color:#fecaca}
+.badge.med{background:#fffbeb;color:#b45309;border-color:#fde68a}
+.badge.low{background:#eff6ff;color:#1d4ed8;border-color:#bfdbfe}
+.badge.done{background:#ecfdf5;color:#047857;border-color:#a7f3d0}
+.badge.doing{background:#eef2ff;color:#4338ca;border-color:#c7d2fe}
+.badge.todo{background:#f3f4f6;color:#374151}
+.badge.overdue{background:#dc2626;color:#fff;border-color:#dc2626}
+
+/* Charts */
+.donutWrap{display:flex;gap:18px;align-items:center}
+.legend{display:grid;gap:7px;font-size:14px}
+.bars{display:flex;align-items:flex-end;gap:12px;height:150px;padding-top:10px;border-bottom:1px solid var(--line)}
+.barCol{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0}
+.bar{width:min(42px,100%);background:linear-gradient(180deg,var(--brand2),var(--brand));border-radius:9px 9px 3px 3px;min-height:4px;position:relative}
+.barCol span{font-size:11px;color:var(--muted);text-align:center}
+.barCol b{font-size:12px}
+.stackBar{height:14px;background:#e5e7eb;border-radius:99px;overflow:hidden;display:flex}
+.stackBar i{display:block;height:100%}
+
+/* Dev cards */
+.devCardHead{display:flex;gap:12px;align-items:center;margin-bottom:10px}
+.devCardHead .avatar{width:52px;height:52px;font-size:18px}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+.kpi{background:#f9fafb;border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center}
+.kpi b{font-size:20px;display:block}.kpi span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+
+/* Feed / proof */
+.feedItem{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.feedItem:last-child{border-bottom:0}
+.thumb{width:120px;height:78px;object-fit:cover;border-radius:10px;border:1px solid var(--line);cursor:zoom-in;flex-shrink:0;background:#f3f4f6}
+.links{display:flex;gap:7px;flex-wrap:wrap;margin-top:7px}
+.linkPill{font-size:12.5px;font-weight:700;text-decoration:none;padding:6px 9px;border-radius:99px;background:#111827;color:#fff}
+.linkPill.light{background:#eef2ff;color:#3730a3}
+.proofStrip{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.proofCard{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff}
+.proofCard img{width:100%;height:150px;object-fit:cover;display:block;cursor:zoom-in;background:#f3f4f6}
+.proofCard .in{padding:11px}
+
+/* Board */
+.board{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;align-items:start}
+.col{background:#eceff5;border:1px solid var(--line);border-radius:16px;padding:12px;min-height:220px}
+.col.dragOver{outline:2px dashed var(--brand);outline-offset:-6px}
+.colHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.colHead b{font-size:15px}
+.count{background:#fff;border:1px solid var(--line);border-radius:99px;padding:2px 9px;font-size:12px;font-weight:800}
+.taskCard{background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px;margin-bottom:10px;box-shadow:0 3px 14px rgba(0,0,0,.05);cursor:grab}
+.taskCard:active{cursor:grabbing}
+.taskCard h4{margin:8px 0 5px;font-size:15px;line-height:1.3}
+.taskCard p{margin:0;color:var(--muted);font-size:13px;line-height:1.45}
+.taskMeta{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.miniAvatar{width:26px;height:26px;border-radius:50%;display:inline-grid;place-items:center;color:#fff;font-size:10px;font-weight:850;vertical-align:middle}
+.cardBtns{display:flex;gap:6px;margin-top:11px}
+.cardBtns button{flex:1}
+
+/* Table */
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{padding:11px 9px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+tr:last-child td{border-bottom:0}
+
+/* Log */
+.dayHead{display:flex;gap:10px;align-items:center;margin:22px 0 10px}
+.dayHead h2{margin:0;font-size:18px}
+.dayLine{flex:1;height:1px;background:var(--line)}
+.updateCard{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:var(--shadow);display:flex;gap:16px}
+.updateCard .shot{width:280px;max-width:38vw;height:175px;object-fit:cover;border-radius:12px;border:1px solid var(--line);cursor:zoom-in;flex-shrink:0}
+.updateBody{flex:1;min-width:0}
+.updateBody h3{margin:5px 0 6px;font-size:17px}
+.updateBody p{margin:0 0 8px;line-height:1.55}
+.blockerBox{background:#fffbeb;border:1px solid #fde68a;color:#92400e;padding:9px 11px;border-radius:10px;font-size:13.5px;margin-top:8px}
+.nextBox{background:#f9fafb;border:1px solid var(--line);padding:9px 11px;border-radius:10px;font-size:13.5px;margin-top:8px}
+
+/* Gallery */
+.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+
+/* Views */
+.view{display:block;scroll-margin-top:14px;margin-bottom:38px}
+.sectionHead{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;border-top:2px solid #e0e7ff;padding-top:22px;margin-bottom:14px}
+.sectionHead h2{margin:0;font-size:23px;letter-spacing:-.02em}
+.sectionHead p{margin:0;color:var(--muted);font-size:13.5px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.empty{padding:28px;text-align:center;color:var(--muted);border:1.5px dashed #d1d5db;border-radius:16px;background:#fff}
+.how{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.stepNum{width:32px;height:32px;border-radius:50%;background:var(--brand);color:#fff;display:grid;place-items:center;font-weight:850;margin-bottom:8px}
+
+/* Modal */
+.modalOverlay{position:fixed;inset:0;background:rgba(17,24,39,.55);display:none;place-items:center;padding:16px;z-index:50}
+.modalOverlay.open{display:grid}
+.modal{background:#fff;width:min(720px,100%);max-height:92vh;overflow:auto;border-radius:20px;padding:22px}
+.modal.wide{width:min(860px,100%)}
+.modal h2{margin:0 0 4px}
+.formGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.field{display:grid;gap:6px}.field.full{grid-column:1/-1}
+.field label{font-size:13px;font-weight:750}
+.field input,.field select,.field textarea{border:1px solid #d1d5db;border-radius:11px;padding:11px 12px;font-size:14.5px;width:100%;background:#fff}
+.field textarea{min-height:92px;resize:vertical}
+.modalBtns{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap}
+.shotPreview{width:100%;max-height:220px;object-fit:cover;border-radius:12px;border:1px solid var(--line);display:none}
+.dropHint{font-size:12.5px;color:var(--muted)}
+
+
+/* Daily Goal document */
+.doc{background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);padding:30px 32px;max-width:1020px;margin:0 auto}
+.docHead{border-bottom:3px solid var(--brand);padding-bottom:18px;margin-bottom:20px}
+.eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--brand);font-weight:850}
+.docHead h1{margin:8px 0 8px;font-size:30px;letter-spacing:-.02em;line-height:1.15}
+.docMeta{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.docSection{margin:22px 0}
+.docSection>h2{font-size:19px;margin:0 0 8px}
+.docSection p,.assignBody p{line-height:1.65;margin:0 0 10px}
+.assignCard{border:1px solid var(--line);border-radius:18px;overflow:hidden;margin:20px 0}
+.assignHead{display:flex;gap:13px;align-items:center;background:#f8fafc;border-bottom:1px solid var(--line);padding:16px 18px;flex-wrap:wrap}
+.assignHead .avatar{width:50px;height:50px;font-size:17px}
+.assignHead h2{margin:0;font-size:20px}
+.assignBody{padding:18px}
+.assignBody h3{margin:16px 0 7px;font-size:15px;text-transform:uppercase;letter-spacing:.06em;color:#374151}
+.assignBody h3:first-child{margin-top:0}
+.goalItems{display:grid;gap:8px;margin-top:8px}
+.goalItem{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--line);border-radius:13px;padding:12px;background:#fff}
+.goalItem.done{background:#f0fdf4;border-color:#bbf7d0}
+.itemNum{width:30px;height:30px;border-radius:50%;background:#111827;color:#fff;display:grid;place-items:center;font-weight:850;font-size:13px;flex-shrink:0}
+.goalItem.done .itemNum{background:var(--green)}
+.itemText{flex:1;min-width:0;line-height:1.5;font-size:14.5px}
+.goalItem.done .itemText{text-decoration:line-through;color:#4b5563}
+.itemMeta{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.itemActions{display:flex;gap:6px;align-items:center;flex-shrink:0;flex-wrap:wrap}
+.statusSel{padding:8px;border:1px solid #d1d5db;border-radius:9px;font-weight:700;font-size:13px;background:#fff}
+.deliverableBox{background:#eef2ff;border-left:5px solid var(--brand);border-radius:0 13px 13px 0;padding:14px 16px;margin-top:16px}
+.deliverableList{margin:8px 0 0;padding-left:26px;line-height:1.65}
+.deliverableList li{margin:4px 0;padding-left:3px}
+.deliverableList li::marker{color:var(--brand);font-weight:850}
+.updDevGoalBody .deliverableList{margin-top:4px;font-size:14px}
+.actualBox{background:#ecfdf5;border:1px solid #a7f3d0;border-radius:13px;padding:14px 16px;margin-top:14px}
+.actualBox .feedItem{border-color:#a7f3d0}
+.docFoot{border-top:1px dashed #d1d5db;margin-top:24px;padding-top:14px;color:var(--muted);font-size:13px}
+.goalFormTasks{min-height:170px!important;line-height:1.6}
+.todayGoalCard{margin-bottom:14px;border:2px solid #c7d2fe;background:linear-gradient(135deg,#fff,#eef2ff)}
+@media(max-width:700px){.doc{padding:20px 16px}.goalItem{flex-wrap:wrap}.itemActions{width:100%}.itemActions select{flex:1}}
+
+
+/* Per-developer goal form */
+.bigFieldLabel{font-size:16px!important;display:flex;align-items:center;gap:9px}
+.fieldStep{width:28px;height:28px;border-radius:50%;background:var(--brand);color:#fff;display:inline-grid;place-items:center;font-size:14px;font-weight:850;flex-shrink:0}
+.dgContext{background:#eef2ff;border:1px solid #c7d2fe;border-radius:12px;padding:12px 14px;font-size:13.5px;line-height:1.55;margin-top:14px}
+.dgOverall summary{font-size:13px;font-weight:750;cursor:pointer;color:#374151}
+.dgOverall textarea{margin-top:8px;border:1px solid #d1d5db;border-radius:11px;padding:11px 12px;font-size:14.5px;width:100%;min-height:76px;resize:vertical}
+
+
+/* Log Today's Work: today's Goal / Tasks / Expected Deliverable */
+.updGoalBox{margin-top:14px}
+.updGoalHead{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:9px}
+.updGoalHead b{font-size:15.5px}
+.updDevGoal{border:1px solid var(--line);border-radius:14px;margin-bottom:9px;background:#fff;overflow:hidden}
+.updDevGoal summary{cursor:pointer;list-style:none;display:flex;gap:10px;align-items:center;padding:11px 13px;background:#f8fafc;font-size:14.5px}
+.updDevGoal summary::-webkit-details-marker{display:none}
+.updDevGoalBody{padding:12px 14px}
+.updMiniLabel{font-size:11.5px;font-weight:850;letter-spacing:.07em;text-transform:uppercase;color:#374151;margin:10px 0 5px}
+.updMiniLabel:first-child{margin-top:0}
+.updDevGoalBody p{margin:0;line-height:1.55;font-size:14px}
+.updTaskRow{display:flex;gap:9px;align-items:flex-start;width:100%;text-align:left;background:#fff;border:1px solid var(--line);border-radius:11px;padding:9px 10px;margin-bottom:6px;font-size:13.5px;line-height:1.45}
+.updTaskRow:hover{border-color:#c7d2fe}
+.updTaskRow.selected{border:2px solid var(--brand);background:#eef2ff}
+.updTaskRow .itemNum{width:24px;height:24px;font-size:11px}
+.updTaskRow.doneRow .updTaskText{text-decoration:line-through;color:#4b5563}
+.updSelectedNote{background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;border-radius:11px;padding:10px 12px;font-size:13.5px;margin-top:9px;line-height:1.5}
+.updNoGoal{background:#fffbeb;border:1px solid #fde68a;color:#92400e;border-radius:12px;padding:12px 14px;font-size:14px;line-height:1.55}
+
+#goalDoc{max-width:1020px;margin:0 auto}
+
+/* Log Today's Work checklist */
+.checkSummaryBox{border:1px solid #c7d2fe;background:#eef2ff;border-radius:11px;padding:11px 12px;font-weight:750;font-size:14px}
+.checkTaskRow{border:1px solid var(--line);border-radius:12px;padding:10px 11px;margin-bottom:7px;background:#fff}
+.checkTaskRow.checked{border:2px solid var(--green);background:#f0fdf4}
+.checkTaskRow.alreadyDone{border-color:#a7f3d0;background:#ecfdf5}
+.checkMain{display:flex;gap:10px;align-items:flex-start;cursor:pointer}
+.checkMain input.logCheck{width:24px;height:24px;flex-shrink:0;accent-color:#059669;cursor:pointer;margin-top:1px}
+.checkMain input.logCheck:disabled{cursor:default;opacity:.85}
+.checkTaskRow.alreadyDone .checkTaskText{text-decoration:line-through;color:#4b5563}
+.logDetails{display:none;grid-template-columns:1fr 110px;gap:8px;margin:9px 0 1px 34px}
+.checkTaskRow.checked .logDetails{display:grid}
+.logDetails input{border:1px solid #d1d5db;border-radius:10px;padding:9px 10px;font-size:13.5px;width:100%;background:#fff}
+.checkAllRow{display:flex;gap:6px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+@media(max-width:600px){.logDetails{grid-template-columns:1fr;margin-left:0}}
+
+
+/* Developer pages (one page per dev) */
+.devTabs{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:1020px;margin:0 auto 16px}
+.devTab{display:flex;gap:12px;align-items:center;text-align:left;background:#fff;border:2px solid var(--line);border-radius:16px;padding:13px 15px;box-shadow:var(--shadow)}
+.devTab .avatar{width:46px;height:46px;font-size:16px}
+.devTab b{font-size:17px;display:block;line-height:1.15}
+.devTab span.role{font-size:12.5px;color:var(--muted)}
+.devTab .viewLbl{margin-left:auto;font-size:12px;font-weight:850;color:var(--muted);white-space:nowrap}
+.devTab.active{border-color:var(--brand);background:#eef2ff}
+.devTab.active .viewLbl{color:var(--brand)}
+@media(max-width:600px){.devTabs{grid-template-columns:1fr}}
+
+
+/* Project page */
+#projectPage{max-width:1020px;margin:0 auto}
+.projectHero{background:linear-gradient(135deg,#111827,#3730a3 60%,#7c3aed);color:#fff;border-radius:20px;padding:28px 26px;box-shadow:var(--shadow);display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
+.projectHero .eyebrow{color:#c7d2fe}
+.projectHero h1{margin:7px 0 0;font-size:34px;letter-spacing:-.03em;line-height:1.1}
+.projectGoalCard{margin-top:14px;padding:20px 22px}
+.projectGoalCard h2,.projectTimelineCard h2{margin:0 0 8px;font-size:21px}
+.projectTimelineCard{margin-top:14px;padding:20px 22px}
+.projectDates{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:stretch;margin-top:14px}
+.projectDate{background:#eef2ff;border:1px solid #c7d2fe;border-radius:16px;padding:16px}
+.projectDate.finish{background:#ecfdf5;border-color:#a7f3d0}
+.projectDate span{display:block;font-size:12px;font-weight:850;letter-spacing:.08em;text-transform:uppercase;color:#4b5563;margin-bottom:7px}
+.projectDate b{display:block;font-size:19px;line-height:1.35}
+.timelineArrow{display:grid;place-items:center;font-size:28px;color:var(--brand);font-weight:900}
+.timelineSummary{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+@media(max-width:700px){.projectHero h1{font-size:28px}.projectHero{padding:22px 18px}.projectDates{grid-template-columns:1fr}.timelineArrow{transform:rotate(90deg);font-size:24px}.projectDate b{font-size:18px}}
+
+/* Lightbox / toast */
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;place-items:center;z-index:80;padding:20px}
+.lightbox.open{display:grid}
+.lightbox img{max-width:min(1100px,96vw);max-height:86vh;border-radius:14px}
+.toast{position:fixed;bottom:20px;right:20px;background:#111827;color:#fff;padding:13px 16px;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.25);display:none;z-index:90;max-width:min(420px,90vw);font-size:14px}
+.toast.show{display:block}
+
+@media(max-width:1180px){.stats{grid-template-columns:repeat(3,1fr)}.board{grid-template-columns:repeat(2,1fr)}.gallery,.proofStrip{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:860px){
+  .app{flex-direction:column}.sidebar{width:100%;height:auto;position:static}
+  .nav{flex-direction:row;flex-wrap:wrap}.nav button{flex:1;justify-content:center}
+  .twoCol,.threeCol,.how{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}
+  .board{grid-template-columns:1fr}.gallery,.proofStrip{grid-template-columns:1fr}
+  .updateCard{flex-direction:column}.updateCard .shot{width:100%;max-width:none}
+  .formGrid{grid-template-columns:1fr}.main{padding:16px}
+}
+@media print{
+  .sidebar,.actions,.toolbar,.cardBtns,.noPrint,.goalToolbar,.sectionHead{display:none!important}
+  .main{padding:0}.view{display:none!important}
+  body:not(.print-goal) #view-dashboard{display:block!important}
+  body.print-goal #view-goal{display:block!important}
+  body.print-goal .itemActions,body.print-goal .banner,body.print-goal .alerts{display:none!important}
+  body{background:#fff}.card{box-shadow:none}.doc{box-shadow:none;border:0;max-width:none}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- SIDEBAR -->
+
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="top">
+      <div class="titleBox">
+        <h1 id="projectTitle">Our Project</h1>
+        <p id="todayLine"></p>
+      </div>
+      <div class="actions noPrint">
+        <button class="btn green" id="topLogBtn" onclick="openUpdate(null, activeDevPageId)">✍️ Log Today's Work</button>
+        <button class="btn primary" id="topAddBtn" onclick="openDevGoal(activeDevPageId)">＋ Add New Task</button>
+      </div>
+    </div>
+
+    <!-- DAILY GOAL DOCUMENT -->
+    <nav class="devTabs noPrint" id="devTabs" aria-label="Pages"></nav>
+
+    <!-- PROJECT PAGE -->
+    <section id="view-project" class="view">
+      <div id="projectPage"></div>
+    </section>
+
+    <section id="view-goal" class="view">
+      <div id="goalDoc"></div>
+    </section>
+
+  </main>
+</div>
+
+
+
+
+<!-- WHO IS ADDING? (generic Add buttons only — section buttons skip this) -->
+<div class="modalOverlay" id="devPickModal">
+  <div class="modal">
+    <h2>Who is adding this task?</h2>
+    <p class="muted smallText">Anyone can view this site. This only decides <b>whose section</b> of the Daily Goal document the task is saved under — then you'll fill just Goal, Tasks and Expected Deliverable.</p>
+    <div id="devPickList" style="display:grid;gap:10px;margin-top:16px"></div>
+    <div class="modalBtns"><button class="btn" onclick="closeModal('devPickModal')">Cancel</button></div>
+  </div>
+</div>
+
+<!-- ADD NEW TASK MODAL — only 3 fields: Goal / Tasks / Expected Deliverable -->
+<div class="modalOverlay" id="devGoalModal">
+  <div class="modal">
+    <h2 id="dgModalTitle">＋ Add New Task</h2>
+    <div id="dgContext" class="dgContext"></div>
+    <form id="devGoalForm">
+      <div class="formGrid">
+        <div class="field full">
+          <label class="bigFieldLabel"><span class="fieldStep">1</span> Goal *</label>
+          <textarea id="dgGoal" required placeholder="State the goal for today.&#10;e.g. Develop the initial user dashboard that investors will access after completing onboarding and successfully logging into their accounts."></textarea>
+        </div>
+        <div class="field full">
+          <label class="bigFieldLabel"><span class="fieldStep">2</span> Tasks *</label>
+          <textarea id="dgTasks" class="goalFormTasks" required placeholder="Write the task(s) for the day — one task per line. Numbering (1. 2. 3. …) is added automatically.&#10;e.g.&#10;Develop the main structure and layout of the investor dashboard.&#10;Create the dashboard overview showing portfolio value, investment summary, recent activities and notifications.&#10;Set up dashboard navigation: Overview, Investments, Transactions, Documents, Notifications, Profile, Settings."></textarea>
+        </div>
+        <div class="field full">
+          <label class="bigFieldLabel"><span class="fieldStep">3</span> Expected Deliverable *</label>
+          <textarea id="dgDeliverable" class="goalFormTasks" required placeholder="Write the expected deliverable(s) by the end of the day — one deliverable per line. Numbering (1. 2. 3. …) is added automatically.&#10;e.g.&#10;A functional and responsive initial investor dashboard.&#10;Dashboard navigation implemented and ready for backend integration."></textarea>
+          <span class="dropHint">One deliverable per line — it will be numbered automatically.</span>
+        </div>
+      </div>
+      <div class="modalBtns"><button type="button" class="btn" onclick="closeModal('devGoalModal')">Cancel</button><button class="btn primary">Save</button></div>
+    </form>
+  </div>
+</div>
+
+<!-- DAILY GOAL MODAL -->
+<div class="modalOverlay" id="goalModal">
+  <div class="modal wide">
+    <h2 id="goalModalTitle">New Daily Goal</h2>
+    <p class="muted smallText" style="margin:0">Fill this in once every morning. Write <b>one task per line</b> — numbering (1. 2. 3.…) is added automatically. Each line becomes a trackable task on the board + dashboard.</p>
+    <form id="goalForm">
+      <input type="hidden" id="gGoalId">
+      <div class="formGrid">
+        <div class="field"><label>Date *</label><input type="date" id="gDate" required></div>
+        <div class="field"><label>Document title *</label><input id="gTitle" required placeholder="Daily Development Goal – Starfetch Web Portal"></div>
+        <div class="field full"><label>Overall Objective *</label><textarea id="gOverall" required placeholder="The shared goal for both developers today — how their work connects (e.g. registration → login → dashboard flow)."></textarea></div>
+      </div>
+
+      <h3 id="gDev1Heading" style="margin:22px 0 0">Developer 1</h3>
+      <div class="formGrid">
+        <div class="field full"><label>Area / heading (e.g. Frontend Development)</label><input id="gDev1Area"></div>
+        <div class="field full"><label>Main Goal</label><textarea id="gDev1Goal" placeholder="This developer's main goal for the day in 1–2 sentences."></textarea></div>
+        <div class="field full"><label>Tasks — one per line (numbered automatically)</label><textarea id="gDev1Tasks" class="goalFormTasks" placeholder="Develop the main structure and layout of the investor dashboard.
+Create the dashboard overview showing portfolio value…
+Set up dashboard navigation…"></textarea></div>
+        <div class="field full"><label>Expected Deliverable</label><textarea id="gDev1Deliverable" placeholder="What the boss should be able to see/test at the end of the day."></textarea></div>
+      </div>
+
+      <h3 id="gDev2Heading" style="margin:22px 0 0">Developer 2</h3>
+      <div class="formGrid">
+        <div class="field full"><label>Area / heading (e.g. Backend Development)</label><input id="gDev2Area"></div>
+        <div class="field full"><label>Main Goal</label><textarea id="gDev2Goal" placeholder="This developer's main goal for the day in 1–2 sentences."></textarea></div>
+        <div class="field full"><label>Tasks — one per line (numbered automatically)</label><textarea id="gDev2Tasks" class="goalFormTasks" placeholder="Implement the Sign-Up API…
+Validate registration information…
+Implement the Login API…"></textarea></div>
+        <div class="field full"><label>Expected Deliverable</label><textarea id="gDev2Deliverable" placeholder="What the boss should be able to see/test at the end of the day."></textarea></div>
+      </div>
+
+      <div class="modalBtns"><button type="button" class="btn" onclick="closeModal('goalModal')">Cancel</button><button class="btn primary">Save Daily Goal document</button></div>
+    </form>
+  </div>
+</div>
+
+<!-- TASK MODAL -->
+<div class="modalOverlay" id="taskModal">
+  <div class="modal">
+    <h2 id="taskModalTitle">New task</h2><p class="muted smallText" style="margin:0">Assign it, set a due date, then it appears on the board &amp; dashboard.</p>
+    <form id="taskForm">
+      <input type="hidden" id="taskId">
+      <div class="formGrid">
+        <div class="field full"><label>Task title *</label><input id="taskTitle" required placeholder="e.g. Build checkout page"></div>
+        <div class="field full"><label>Description / acceptance criteria</label><textarea id="taskDesc" placeholder="What does 'done' look like? What should the boss be able to see/test?"></textarea></div>
+        <div class="field"><label>Assigned to</label><select id="taskAssignee"></select></div>
+        <div class="field"><label>Status</label><select id="taskStatus"><option value="todo">To Do</option><option value="doing">Doing</option><option value="done">Done</option></select></div>
+        <div class="field"><label>Priority</label><select id="taskPriority"><option value="low">Low</option><option value="med" selected>Medium</option><option value="high">High</option><option value="urgent">Urgent</option></select></div>
+        <div class="field"><label>Due date</label><input type="date" id="taskDue"></div>
+        <div class="field"><label>Estimate (hours)</label><input type="number" id="taskEstimate" min="0" step="0.5" placeholder="4"></div>
+        <div class="field"><label>Tag (optional)</label><input id="taskTag" placeholder="Frontend / API / Bug"></div>
+      </div>
+      <div class="modalBtns"><button type="button" class="btn" onclick="closeModal('taskModal')">Cancel</button><button class="btn primary">Save task</button></div>
+    </form>
+  </div>
+</div>
+
+
+<!-- EDIT PROJECT MODAL — Title / Main Goal / General Timeline -->
+<div class="modalOverlay" id="projectModal">
+  <div class="modal">
+    <h2>✏️ Edit Project Page</h2>
+    <p class="muted smallText" style="margin:0">Edit the project title, main goal, and the general timeline for the whole project.</p>
+    <form id="projectForm">
+      <div class="formGrid">
+        <div class="field full"><label>Project Title *</label><input id="projTitle" required placeholder="Starfetch Web Portal"></div>
+        <div class="field full"><label>Main Goal *</label><textarea id="projGoal" required placeholder="The main goal of the whole project, in a few sentences — what are you building, for whom, and what will it let them do?"></textarea></div>
+        <div class="field"><label>Project Start Date *</label><input id="projStartDate" type="date" required></div>
+        <div class="field"><label>Project Finish Date *</label><input id="projFinishDate" type="date" required></div>
+        <div class="field full"><span class="dropHint">Select when the whole project starts and when it is expected to finish. The Finish Date must be on or after the Start Date.</span></div>
+      </div>
+      <div class="modalBtns"><button type="button" class="btn" onclick="closeModal('projectModal')">Cancel</button><button class="btn primary">Save Project Page</button></div>
+    </form>
+  </div>
+</div>
+
+<!-- LOG TODAY'S WORK — CHECKLIST -->
+<div class="modalOverlay" id="updateModal">
+  <div class="modal wide">
+    <h2 id="logModalTitle">✅ Log Today's Work — Checklist</h2>
+    <p class="muted smallText" style="margin:0" id="logModalIntro">Tick the tasks that were <b>done today</b>. On save, every newly ticked task is marked <b>Done</b> and logged under this developer. Tasks already Done are shown ticked and locked.</p>
+    <form id="updateForm">
+      <div class="formGrid">
+        <div class="field"><label>Day</label><input type="date" id="updDate"></div>
+        <div class="field"><label>Checklist</label><div id="logCheckSummary" class="checkSummaryBox">0 tasks ticked</div></div>
+      </div>
+
+      <div id="updGoalContext" class="updGoalBox"></div>
+
+      <h3 style="margin:18px 0 4px;font-size:15px">Proof for the ticked tasks <span class="muted" style="font-weight:500">(optional — shared by all newly ticked tasks)</span></h3>
+      <div class="formGrid">
+        <div class="field"><label>🔗 Live / demo link</label><input id="updDemo" placeholder="https://staging.yourapp.com/…"></div>
+        <div class="field"><label>💻 GitHub commit / PR link</label><input id="updGithub" placeholder="https://github.com/.../pull/12"></div>
+        <div class="field full">
+          <label>🖼️ Screenshot proof (upload image)</label>
+          <input type="file" id="updFile" accept="image/*">
+          <span class="dropHint">Tip: screenshot the finished screen. Images are resized &amp; stored in this browser. You can also paste an image URL below instead.</span>
+          <input id="updShotUrl" placeholder="…or paste screenshot image URL https://…">
+          <img id="shotPreview" class="shotPreview" alt="Screenshot preview">
+        </div>
+      </div>
+      <div class="modalBtns"><button type="button" class="btn" onclick="closeModal('updateModal')">Cancel</button><button class="btn green" id="logSaveBtn">Save checklist</button></div>
+    </form>
+  </div>
+</div>
+
+<!-- TASK DETAIL -->
+<div class="modalOverlay" id="detailModal"><div class="modal wide"><div id="detailBody"></div></div></div>
+
+<!-- SETTINGS -->
+<div class="modalOverlay" id="settingsModal">
+  <div class="modal">
+    <h2>⚙️ Project &amp; developers</h2><p class="muted smallText">Rename these once — everywhere updates automatically.</p>
+    <form id="settingsForm"><div class="formGrid">
+      <div class="field full"><label>Project name</label><input id="setProject"></div>
+      <div class="field"><label>Developer 1 name</label><input id="setDev1Name"></div>
+      <div class="field"><label>Developer 1 role</label><input id="setDev1Role" placeholder="Frontend"></div>
+      <div class="field"><label>Developer 2 name</label><input id="setDev2Name"></div>
+      <div class="field"><label>Developer 2 role</label><input id="setDev2Role" placeholder="Backend"></div>
+    </div><div class="modalBtns"><button type="button" class="btn" onclick="closeModal('settingsModal')">Cancel</button><button class="btn primary">Save</button></div></form>
+  </div>
+</div>
+
+<!-- HELP -->
+<div class="modalOverlay" id="helpModal">
+  <div class="modal wide">
+    <h2>❓ How to use ShipLog</h2>
+    <div style="line-height:1.65;font-size:15px">
+      <h3>For the 2 developers (daily)</h3>
+      <ol><li><b>Morning:</b> click <b>＋ Add New Task</b> — the form has only 3 fields: <b>Goal, Tasks (one per line), Expected Deliverable.</b> Only your section of the Daily Goal document is created/updated.</li>
+      <li><b>As you finish something:</b> take a screenshot + copy the live/staging link and GitHub PR link.</li>
+      <li><b>Before you close your laptop:</b> click <b>Log Today's Work</b> (2 min). If something is delaying you, write it in the Blocker field so it can be followed up.</li>
+      <li><b>Share it:</b> let anyone open this page and scroll it, or print/PDF the Daily Goal document.</li></ol>
+      <h3>For the boss (2 minutes)</h3>
+      <ol><li>Check the <b>% complete and overdue</b> cards near the top of the Dashboard section.</li>
+      <li>Scroll to <b>Recently built</b> — click screenshots and live links. That is the actual work, not a claim.</li>
+      <li>Check <b>Needs attention</b>: anyone who hasn't logged today, overdue tasks, blockers waiting on you.</li></ol>
+      <h3>Sharing in this demo version</h3>
+      <p class="smallText muted">Data lives in one browser. To share the exact state: <b>Export backup</b> → send the file → other person clicks <b>Import</b>. For a real always-in-sync version (logins, phone access), see the README upgrade path (Supabase/Firebase) — the screens &amp; data model here already match it.</p>
+    </div>
+    <div class="modalBtns"><button class="btn primary" onclick="closeModal('helpModal')">Got it</button></div>
+  </div>
+</div>
+
+<div class="lightbox" id="lightbox" onclick="this.classList.remove('open')"><img id="lightboxImg" alt="Screenshot enlarged"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ Helpers ============ */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => 'id' + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+function dstr(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function todayStr(){ return dstr(new Date()); }
+function addDays(baseStr, n){ const d = baseStr ? new Date(baseStr+'T12:00:00') : new Date(); d.setDate(d.getDate()+n); return dstr(d); }
+function fmtDate(s){ if(!s) return '—'; const d=new Date(s+'T12:00:00'); return d.toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short'}); }
+function fmtDateFull(s){ if(!s) return '—'; const d=new Date(s+'T12:00:00'); return d.toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'long',year:'numeric'}); }
+function initials(name){ return (name||'?').trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase(); }
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3400); }
+function mockShot(title, label, c1, c2){
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='900' height='560'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='${c1}'/><stop offset='1' stop-color='${c2}'/></linearGradient></defs><rect width='900' height='560' fill='#f8fafc'/><rect width='900' height='54' fill='#111827'/><circle cx='28' cy='27' r='8' fill='#f87171'/><circle cx='54' cy='27' r='8' fill='#fbbf24'/><circle cx='80' cy='27' r='8' fill='#34d399'/><rect x='120' y='15' width='420' height='24' rx='12' fill='#374151'/><rect x='40' y='84' width='820' height='150' rx='18' fill='url(#g)'/><text x='70' y='145' font-family='Arial' font-size='34' font-weight='bold' fill='white'>${title}</text><text x='70' y='183' font-family='Arial' font-size='19' fill='rgba(255,255,255,.9)'>${label}</text><rect x='70' y='200' width='150' height='34' rx='17' fill='white'/><text x='92' y='222' font-family='Arial' font-size='15' font-weight='bold' fill='#111827'>View live →</text><rect x='40' y='260' width='260' height='120' rx='14' fill='white' stroke='#e5e7eb'/><rect x='60' y='282' width='180' height='14' rx='7' fill='#d1d5db'/><rect x='60' y='310' width='220' height='10' rx='5' fill='#e5e7eb'/><rect x='60' y='330' width='140' height='10' rx='5' fill='#e5e7eb'/><rect x='320' y='260' width='260' height='120' rx='14' fill='white' stroke='#e5e7eb'/><rect x='340' y='282' width='150' height='14' rx='7' fill='#d1d5db'/><rect x='340' y='310' width='210' height='10' rx='5' fill='#e5e7eb'/><rect x='340' y='330' width='120' height='10' rx='5' fill='#e5e7eb'/><rect x='600' y='260' width='260' height='120' rx='14' fill='white' stroke='#e5e7eb'/><rect x='620' y='282' width='190' height='14' rx='7' fill='#d1d5db'/><rect x='620' y='310' width='200' height='10' rx='5' fill='#e5e7eb'/><rect x='620' y='330' width='160' height='10' rx='5' fill='#e5e7eb'/><rect x='40' y='405' width='820' height='110' rx='14' fill='white' stroke='#e5e7eb'/><rect x='65' y='430' width='500' height='12' rx='6' fill='#e5e7eb'/><rect x='65' y='455' width='650' height='12' rx='6' fill='#e5e7eb'/><rect x='65' y='480' width='380' height='12' rx='6' fill='#e5e7eb'/></svg>`;
+  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+}
+
+/* ============ Seed data (dates relative to TODAY so demo always looks alive) ============ */
+function starfetchPlan(dateStrVal){
+  const mk = (prefix, arr) => arr.map((text,i)=>({id:prefix+(i+1), text}));
+  return {
+    id:'plan-'+dateStrVal, date:dateStrVal,
+    title:'Daily Development Goal – Starfetch Web Portal',
+    overallObjective:'To continue the development of the Starfetch investor portal by working on the user dashboard after onboarding, while David works on the backend integration of the Login and Sign-Up pages. The goal is to establish a functional flow from user registration and login to accessing the investor dashboard.',
+    assignments:[
+      { devId:'dev1', area:'Frontend Development',
+        mainGoal:'Develop the initial user dashboard that investors will access after completing onboarding and successfully logging into their accounts.',
+        expectedDeliverable:'A functional and responsive initial investor dashboard with the major sections and navigation implemented and ready for backend integration.',
+        items: mk('e', [
+          'Develop the main structure and layout of the investor dashboard.',
+          'Create the dashboard overview showing key information such as portfolio value, investment summary, recent activities and notifications.',
+          'Set up dashboard navigation for sections such as Overview, Investments, Transactions, Documents, Notifications, Profile and Settings.',
+          'Ensure the dashboard is responsive across desktop, tablet and mobile screens.',
+          'Use mock data temporarily for dashboard information that does not yet have a backend API.',
+          'Prepare the frontend to receive authenticated user information from the backend.',
+          'Ensure unauthenticated users cannot access protected dashboard pages.',
+          'Prepare the dashboard structure so future features such as KYC, portfolio management and investment transactions can be integrated without major frontend changes.'
+        ])},
+      { devId:'dev2', area:'Backend Development',
+        mainGoal:'Complete the backend integration for the Login and Sign-Up pages and establish the authentication foundation required for users to securely access the investor portal.',
+        expectedDeliverable:'A functional authentication backend that allows users to register, log in, maintain an authenticated session and access protected functionality.',
+        items: mk('d', [
+          'Implement the Sign-Up API for creating new investor accounts.',
+          'Validate registration information and prevent duplicate accounts.',
+          'Securely store user credentials and account information.',
+          'Implement the Login API and validate user credentials.',
+          'Implement authentication/session management for logged-in users.',
+          'Create protected backend routes that can only be accessed by authenticated users.',
+          "Provide an endpoint for retrieving the currently logged-in user's basic information.",
+          'Implement proper error handling for incorrect passwords, invalid accounts, duplicate registrations and other authentication errors.',
+          'Document the authentication API request and response structure for frontend integration.'
+        ])}
+    ]
+  };
+}
+function tasksFromPlan(plan, statusFor){
+  const out=[];
+  (plan.assignments||[]).forEach(a=>{
+    (a.items||[]).forEach((item,i)=>{
+      out.push({ id:uid(), title:item.text,
+        desc:a.area+' — '+plan.title+' ('+plan.date+'). Main Goal: '+a.mainGoal+' Expected Deliverable: '+a.expectedDeliverable,
+        assignee:a.devId, status: statusFor ? statusFor(a,item,i) : 'todo', priority:'med',
+        due:plan.date, estimate:null, tag:a.area, planId:plan.id, planItemId:item.id, createdAt:plan.date });
+    });
+  });
+  return out;
+}
+function seed(){
+  const t = todayStr();
+  const plan = starfetchPlan(t);
+  const tasks = tasksFromPlan(plan, (a,item,i)=> i===0 ? 'doing' : 'todo');
+  return {
+    version:2, project:'Starfetch Web Portal',
+    devs:[
+      {id:'dev1', name:'Emmanuel', role:'Frontend Development', color:'#2563eb'},
+      {id:'dev2', name:'David', role:'Backend Development', color:'#059669'},
+    ],
+    tasks, updates:[], plans:[plan], projectInfo: defaultProjectInfo()
+  };
+}
+
+/* ============ State ============ */
+const KEY = 'shiplog_v2';
+let state;
+try { state = JSON.parse(localStorage.getItem(KEY)) || seed(); if(!state.tasks || !state.plans) state = seed(); }
+catch(e){ state = seed(); }
+let selectedPlanId = null;
+let currentShot = '';
+function normalizeTaskStatuses(){ (state.tasks||[]).forEach(t=>{ if(!['todo','doing','done'].includes(t.status)) t.status='doing'; }); }
+function save(){ normalizeTaskStatuses(); try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){ toast('⚠️ Storage full — screenshot too large. Export a backup and use smaller images.'); } }
+/* One-time request: clear all goals/tasks dated 28 Oct 2026. The flag ensures
+   new work added for that same day afterwards is not deleted on refresh. */
+const CLEAR_TODAY_DATE = '2026-10-28';
+const CLEAR_TODAY_KEY = 'shiplog_cleared_2026-10-28_v1';
+function clearTodayGoalAndTasksOnce(){
+  let alreadyCleared = false;
+  try{ alreadyCleared = localStorage.getItem(CLEAR_TODAY_KEY)==='done'; }catch(e){}
+  if(alreadyCleared) return;
+  const deletedPlanIds = new Set((state.plans||[]).filter(p=>p.date===CLEAR_TODAY_DATE).map(p=>p.id));
+  const deletedTaskIds = new Set((state.tasks||[]).filter(t=>deletedPlanIds.has(t.planId) || t.due===CLEAR_TODAY_DATE || t.createdAt===CLEAR_TODAY_DATE).map(t=>t.id));
+  state.plans = (state.plans||[]).filter(p=>p.date!==CLEAR_TODAY_DATE);
+  state.tasks = (state.tasks||[]).filter(t=>!deletedTaskIds.has(t.id));
+  state.updates = (state.updates||[]).filter(u=>!deletedTaskIds.has(u.taskId));
+  if(deletedPlanIds.has(selectedPlanId)) selectedPlanId = null;
+  try{ localStorage.setItem(CLEAR_TODAY_KEY,'done'); }catch(e){}
+  save();
+}
+clearTodayGoalAndTasksOnce();
+const devById = id => state.devs.find(d=>d.id===id) || state.devs[0];
+const taskById = id => state.tasks.find(t=>t.id===id);
+const query = () => '';
+function matchesQ(text){ const q=query(); return !q || String(text||'').toLowerCase().includes(q); }
+function isOverdue(t){ return t.due && t.status!=='done' && t.due < todayStr(); }
+function hoursForTask(id){ return state.updates.filter(u=>u.taskId===id).reduce((s,u)=>s+(+u.hours||0),0); }
+function streakFor(devId){
+  const days = new Set(state.updates.filter(u=>u.devId===devId).map(u=>u.date));
+  let s=0, cur=todayStr();
+  if(!days.has(cur)) cur = addDays(cur,-1);
+  while(days.has(cur)){ s++; cur = addDays(cur,-1); }
+  return s;
+}
+
+/* ============ Navigation ============ */
+function showView(v){
+  // One stacked page (no menu): "showing" a section just scrolls to it.
+  const el = $('#view-'+v);
+  if(el && el.scrollIntoView) el.scrollIntoView({behavior:'smooth', block:'start'});
+}
+$('#globalSearch')?.addEventListener('input', renderAll);
+$('#boardDevFilter')?.addEventListener('change', renderBoard);
+$('#logDevFilter')?.addEventListener('change', renderLog);
+$('#logDateFilter')?.addEventListener('change', renderLog);
+
+/* ============ Rendering: shared bits ============ */
+function statusBadge(s){ if(!['todo','doing','done'].includes(s)) s='doing'; const map={todo:'To Do',doing:'Doing',done:'✅ Done'}; return `<span class="badge ${s}">${map[s]||s}</span>`; }
+function devBadge(devId){ const d=devById(devId); return `<span class="badge"><span class="miniAvatar" style="background:${d.color}">${esc(initials(d.name))}</span> ${esc(d.name)}</span>`; }
+function linkPills(u){
+  let h='';
+  if(u.demoLink) h+=`<a class="linkPill" href="${esc(u.demoLink)}" target="_blank" rel="noopener">🔗 Open live / demo ↗</a>`;
+  if(u.githubLink) h+=`<a class="linkPill light" href="${esc(u.githubLink)}" target="_blank" rel="noopener">💻 GitHub ↗</a>`;
+  return h ? `<div class="links">${h}</div>` : '';
+}
+function openLightbox(src){ $('#lightboxImg').src=src; $('#lightbox').classList.add('open'); }
+
+/* ============ Dashboard ============ */
+function renderHeader(){
+  $('#projectTitle').textContent = state.project;
+  $('#todayLine').textContent = fmtDateFull(todayStr());
+}
+
+function renderDashboard(){
+  const total=state.tasks.length, done=state.tasks.filter(t=>t.status==='done').length;
+  const doing=state.tasks.filter(t=>t.status==='doing').length;
+  const overdue=state.tasks.filter(isOverdue).length;
+  const pct = total? Math.round(done/total*100):0;
+  const weekStart = addDays(todayStr(),-6);
+  const weekHours = state.updates.filter(u=>u.date>=weekStart).reduce((s,u)=>s+(+u.hours||0),0);
+  const todayUpdates = state.updates.filter(u=>u.date===todayStr()).length;
+  const cards=[
+    ['Project complete', pct+'%', done+' of '+total+' tasks done'],
+    ['In progress', doing, 'tasks being worked on now'],
+    ['Overdue', overdue, overdue?'past due date':'on schedule ✓'],
+    ['Hours (last 7 days)', weekHours, 'logged by both devs'],
+    ['Updates today', todayUpdates, 'proof items logged today'],
+  ];
+  $('#statsRow').innerHTML = cards.map(c=>`<div class="card statCard"><div class="label">${c[0]}</div><div class="num">${c[1]}</div><div class="sub">${c[2]}</div></div>`).join('');
+
+  // donut
+  const r=62, circ=2*Math.PI*r;
+  $('#donut').innerHTML = `<svg width="160" height="160" viewBox="0 0 160 160"><circle cx="80" cy="80" r="${r}" fill="none" stroke="#e5e7eb" stroke-width="18"/><circle cx="80" cy="80" r="${r}" fill="none" stroke="#4f46e5" stroke-width="18" stroke-linecap="round" stroke-dasharray="${circ*pct/100} ${circ}" transform="rotate(-90 80 80)"/><text x="80" y="78" text-anchor="middle" font-size="30" font-weight="bold" fill="#111827">${pct}%</text><text x="80" y="100" text-anchor="middle" font-size="12" fill="#6b7280">complete</text></svg>`;
+  $('#donutLegend').innerHTML = ['done','doing','todo'].map(s=>{const n=state.tasks.filter(t=>t.status===s).length; return `<div>${statusBadge(s)} <b>${n}</b> task${n===1?'':'s'}</div>`;}).join('');
+  $('#overallBar').style.width=pct+'%';
+  $('#overallText').textContent = done+' done • '+(total-done)+' remaining';
+
+  // per-dev bars
+  $('#perDevBars').innerHTML = state.devs.map(d=>{
+    const mine=state.tasks.filter(t=>t.assignee===d.id);
+    const dn=mine.filter(t=>t.status==='done').length, dg=mine.filter(t=>t.status==='doing').length;
+    const pc = n=> mine.length? (n/mine.length*100):0;
+    return `<div><div style="display:flex;justify-content:space-between;font-size:14px"><b>${esc(d.name)}</b><span class="muted">${dn}/${mine.length} done</span></div>
+    <div class="stackBar" style="margin-top:6px"><i style="width:${pc(dn)}%;background:#059669"></i><i style="width:${pc(dg)}%;background:#4f46e5"></i></div>
+    <div class="muted" style="font-size:12px;margin-top:4px">🟢 Done ${dn} &nbsp; 🟣 Doing ${dg} &nbsp; ⚪ To do ${mine.length-dn-dg}</div></div>`;
+  }).join('');
+
+  // 7-day chart
+  const days=[]; for(let i=6;i>=0;i--){ const ds=addDays(todayStr(),-i); days.push({ds, n:state.updates.filter(u=>u.date===ds).length, h:state.updates.filter(u=>u.date===ds).reduce((s,u)=>s+(+u.hours||0),0)}); }
+  const max=Math.max(1,...days.map(d=>d.n));
+  $('#weekChart').innerHTML = days.map(d=>`<div class="barCol"><b>${d.n||''}</b><div class="bar" style="height:${Math.max(4,d.n/max*110)}px" title="${d.n} updates, ${d.h}h"></div><span>${d.ds===todayStr()?'Today':fmtDate(d.ds).split(' ')[0]}<br>${d.h}h</span></div>`).join('');
+  $('#weekSummary').textContent = days.reduce((s,d)=>s+d.n,0)+' updates • '+days.reduce((s,d)=>s+d.h,0)+' hours in the last 7 days';
+
+  // attention
+  const att=[];
+  state.tasks.filter(isOverdue).forEach(t=>att.push(`⏰ <b>Overdue:</b> ${esc(t.title)} — ${esc(devById(t.assignee).name)}, was due ${fmtDate(t.due)}`));
+  state.updates.filter(u=>u.blocker).slice(-4).reverse().forEach(u=>att.push(`🚧 <b>Blocker:</b> ${esc(u.blocker)} <span class="muted">(${esc(devById(u.devId).name)}, ${fmtDate(u.date)})</span>`));
+  state.tasks.filter(t=>t.status==='doing' && !state.updates.some(u=>u.taskId===t.id && u.date>=addDays(todayStr(),-2))).forEach(t=>att.push(`👀 <b>No recent update:</b> ${esc(t.title)} is “Doing” but has no proof logged in 3 days`));
+  $('#attentionList').innerHTML = att.length ? att.slice(0,6).map(x=>`<div style="padding:8px 0;border-bottom:1px solid var(--line);font-size:14px">${x}</div>`).join('') : '<p class="muted smallText">Nothing needs attention. 🎉</p>';
+
+  // dev cards
+  $('#devCards').innerHTML = state.devs.map(d=>{
+    const mine=state.tasks.filter(t=>t.assignee===d.id);
+    const myUp=state.updates.filter(u=>u.devId===d.id);
+    const todayH=myUp.filter(u=>u.date===todayStr()).reduce((s,u)=>s+(+u.hours||0),0);
+    const weekH=myUp.filter(u=>u.date>=weekStart).reduce((s,u)=>s+(+u.hours||0),0);
+    const focus=mine.filter(t=>t.status==='doing');
+    const last=[...myUp].sort((a,b)=>b.date.localeCompare(a.date))[0];
+    const blockers=myUp.filter(u=>u.blocker).length;
+    return `<div class="card">
+      <div class="devCardHead"><div class="avatar" style="background:${d.color}">${esc(initials(d.name))}</div>
+      <div style="flex:1"><b style="font-size:18px">${esc(d.name)}</b><div class="muted smallText">${esc(d.role||'Developer')} • 🔥 ${streakFor(d.id)}-day logging streak</div></div>
+      <div style="display:grid;gap:6px"><button class="btn small primary" onclick="openDevGoal('${d.id}')">＋ Add New Task</button><button class="btn small green" onclick="openUpdate(null,'${d.id}')">+ Log work</button></div></div>
+      <div class="kpis"><div class="kpi"><b>${mine.filter(t=>t.status==='done').length}/${mine.length}</b><span>Tasks done</span></div><div class="kpi"><b>${todayH}h</b><span>Today</span></div><div class="kpi"><b>${weekH}h</b><span>This week</span></div></div>
+      <div class="smallText"><b>Currently working on:</b> ${focus.length? focus.map(t=>esc(t.title)).join(' • ') : '<span class="muted">nothing marked Doing</span>'}</div>
+      <div class="smallText" style="margin-top:6px"><b>Last update:</b> ${last? fmtDate(last.date)+' — '+esc(taskById(last.taskId)?.title||'') : '<span class="muted">none yet</span>'}</div>
+      ${blockers?`<div class="blockerBox">🚧 ${blockers} blocker(s) reported — see Daily Log</div>`:''}
+    </div>`;
+  }).join('');
+
+  // recent proof
+  const withShots=[...state.updates].filter(u=>u.screenshot).sort((a,b)=>(b.date+b.createdAt).localeCompare(a.date+a.createdAt)).slice(0,6);
+  $('#recentProof').innerHTML = withShots.length ? withShots.map(u=>`<div class="proofCard"><img src="${esc(u.screenshot)}" onclick="openLightbox(this.src)" alt="Screenshot proof"><div class="in"><b>${esc(taskById(u.taskId)?.title||'Task')}</b><div class="muted smallText">${esc(devById(u.devId).name)} • ${fmtDate(u.date)} • ${u.hours||0}h</div>${linkPills(u)}</div></div>`).join('') : '<div class="empty">No screenshots yet. Devs: Log Today\'s Work and attach one.</div>';
+
+  // activity
+  const feed=[...state.updates].sort((a,b)=>(b.date+ (b.createdAt||'')).localeCompare(a.date+(a.createdAt||''))).slice(0,8);
+  $('#activityFeed').innerHTML = feed.length ? feed.map(u=>`<div class="feedItem">${u.screenshot?`<img class="thumb" src="${esc(u.screenshot)}" onclick="openLightbox(this.src)">`:''}<div style="flex:1;min-width:0"><b>${esc(taskById(u.taskId)?.title||'Task')}</b> <span class="muted smallText">— ${esc(devById(u.devId).name)} • ${fmtDate(u.date)} • ${u.hours||0}h</span><p style="margin:4px 0 0" class="smallText">${esc(u.text)}</p>${linkPills(u)}</div></div>`).join('') : '<p class="muted">No activity yet.</p>';
+}
+
+/* ============ Board ============ */
+function renderBoard(){
+  const f=$('#boardDevFilter').value;
+  const cols=[['todo','📋 To Do'],['doing','🔨 Doing'],['done','✅ Done']];
+  $('#board').innerHTML = cols.map(([status,label])=>{
+    const list=state.tasks.filter(t=>t.status===status && (f==='all'||t.assignee===f) && matchesQ(t.title+' '+t.desc+' '+(t.tag||'')));
+    return `<div class="col" data-status="${status}" ondragover="event.preventDefault();this.classList.add('dragOver')" ondragleave="this.classList.remove('dragOver')" ondrop="dropTask(event,'${status}')">
+      <div class="colHead"><b>${label}</b><span class="count">${list.length}</span></div>
+      ${list.map(t=>taskCard(t)).join('') || '<p class="muted smallText" style="text-align:center;padding:14px 0">Empty — drag tasks here</p>'}
+    </div>`;
+  }).join('');
+}
+function taskCard(t){
+  const n=state.updates.filter(u=>u.taskId===t.id).length;
+  return `<div class="taskCard" draggable="true" ondragstart="event.dataTransfer.setData('text/plain','${t.id}')" onclick="if(event.target.tagName!=='BUTTON')openDetail('${t.id}')">
+    <span class="badge ${t.priority}">${({low:'Low',med:'Medium',high:'High',urgent:'🔥 Urgent'})[t.priority]||t.priority}</span>
+    ${t.tag?`<span class="badge">${esc(t.tag)}</span>`:''} ${isOverdue(t)?'<span class="badge overdue">⏰ OVERDUE</span>':''}
+    <h4>${esc(t.title)}</h4><p>${esc((t.desc||'').slice(0,110))}${(t.desc||'').length>110?'…':''}</p>
+    <div class="taskMeta">${devBadge(t.assignee)}<span class="badge">📅 ${fmtDate(t.due)}</span><span class="badge">⏱️ ${hoursForTask(t.id)}h logged</span><span class="badge">📝 ${n} update${n===1?'':'s'}</span></div>
+    <div class="cardBtns"><button class="btn small green" onclick="openUpdate('${t.id}')">✍️ Log work</button><button class="btn small" onclick="openDetail('${t.id}')">Proof & history</button></div>
+  </div>`;
+}
+function dropTask(e,status){ e.preventDefault(); document.querySelectorAll('.col').forEach(c=>c.classList.remove('dragOver')); const id=e.dataTransfer.getData('text/plain'); const t=taskById(id); if(t){ t.status=status; save(); renderAll(); toast('Moved “'+t.title+'” → '+status); } }
+
+/* ============ Daily log ============ */
+function renderLog(){
+  const f=$('#logDevFilter').value, df=$('#logDateFilter').value;
+  let ups=[...state.updates].filter(u=>(f==='all'||u.devId===f) && (!df||u.date===df) && matchesQ(u.text+' '+(taskById(u.taskId)?.title||''))).sort((a,b)=>(b.date+(b.createdAt||'')).localeCompare(a.date+(a.createdAt||'')));
+  if(!ups.length){ $('#logList').innerHTML='<div class="empty">No updates match. Click “Log Today\'s Work” to add the first one for this filter.</div>'; return; }
+  const groups={}; ups.forEach(u=>{ (groups[u.date]=groups[u.date]||[]).push(u); });
+  $('#logList').innerHTML = Object.keys(groups).sort().reverse().map(date=>{
+    const dayUps=groups[date]; const hrs=dayUps.reduce((s,u)=>s+(+u.hours||0),0);
+    const label = date===todayStr() ? 'Today — '+fmtDateFull(date) : date===addDays(todayStr(),-1) ? 'Yesterday — '+fmtDateFull(date) : fmtDateFull(date);
+    return `<div class="dayHead"><h2>${label}</h2><span class="badge">${dayUps.length} update${dayUps.length===1?'':'s'} • ${hrs}h</span><div class="dayLine"></div></div>` +
+    dayUps.map(u=>`<article class="updateCard">${u.screenshot?`<img class="shot" src="${esc(u.screenshot)}" onclick="openLightbox(this.src)" alt="Screenshot proof">`:''}
+      <div class="updateBody">${devBadge(u.devId)} <span class="badge">⏱️ ${u.hours||0}h</span> ${statusBadge(taskById(u.taskId)?.status||'doing')}
+      <h3>${esc(taskById(u.taskId)?.title||'Task (deleted)')}</h3><p>${esc(u.text)}</p>${linkPills(u)}
+      ${u.blocker?`<div class="blockerBox">🚧 <b>Blocker:</b> ${esc(u.blocker)}</div>`:''}
+      ${u.nextStep?`<div class="nextBox">➡️ <b>Next:</b> ${esc(u.nextStep)}</div>`:''}
+      <div style="margin-top:10px;display:flex;gap:6px"><button class="btn small" onclick="openDetail('${u.taskId}')">Full task history</button><button class="btn small danger" onclick="deleteUpdate('${u.id}')">Delete update</button></div>
+      </div></article>`).join('');
+  }).join('');
+}
+function deleteUpdate(id){ if(confirm('Delete this update? The boss will no longer see this proof.')){ state.updates=state.updates.filter(u=>u.id!==id); save(); renderAll(); } }
+
+/* ============ Gallery & tasks table ============ */
+function renderGallery(){
+  const items=[...state.updates].filter(u=>u.screenshot).sort((a,b)=>b.date.localeCompare(a.date));
+  $('#galleryGrid').innerHTML = items.length ? items.map(u=>`<div class="proofCard"><img src="${esc(u.screenshot)}" onclick="openLightbox(this.src)"><div class="in"><b>${esc(taskById(u.taskId)?.title||'')}</b><div class="muted smallText">${esc(devById(u.devId).name)} • ${fmtDateFull(u.date)}</div><p class="smallText" style="margin:7px 0 0">${esc(u.text.slice(0,140))}…</p>${linkPills(u)}</div></div>`).join('') : '<div class="empty">No screenshots yet.</div>';
+}
+function renderTasks(){
+  const rows=[...state.tasks].filter(t=>matchesQ(t.title+' '+t.desc)).sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999'));
+  $('#tasksBody').innerHTML = rows.map(t=>`<tr><td><b>${esc(t.title)}</b><br><span class="muted smallText">${esc((t.desc||'').slice(0,90))}</span></td><td>${devBadge(t.assignee)}</td><td>${statusBadge(t.status)}${isOverdue(t)?'<br><span class="badge overdue" style="margin-top:5px">OVERDUE</span>':''}</td><td><span class="badge ${t.priority}">${t.priority}</span></td><td>${fmtDate(t.due)}</td><td>${hoursForTask(t.id)}h${t.estimate?' / '+t.estimate+'h est.':''}</td><td>${state.updates.filter(u=>u.taskId===t.id).length}</td>
+  <td style="white-space:nowrap"><button class="btn small green" onclick="openUpdate('${t.id}')">Log</button> <button class="btn small" onclick="openTask('${t.id}')">Edit</button> <button class="btn small danger" onclick="deleteTask('${t.id}')">✕</button></td></tr>`).join('') || '<tr><td colspan="8" class="muted">No tasks.</td></tr>';
+}
+function deleteTask(id){ if(confirm('Delete this task and all its updates/proof?')){ state.tasks=state.tasks.filter(t=>t.id!==id); state.updates=state.updates.filter(u=>u.taskId!==id); save(); renderAll(); } }
+
+/* ============ Modals / forms ============ */
+function openModal(id){ $('#'+id).classList.add('open'); }
+function closeModal(id){ $('#'+id).classList.remove('open'); }
+document.querySelectorAll('.modalOverlay').forEach(o=>o.addEventListener('click',e=>{ if(e.target===o) o.classList.remove('open'); }));
+
+function fillDevSelects(){
+  const opts=state.devs.map(d=>`<option value="${d.id}">${esc(d.name)} (${esc(d.role||'Developer')})</option>`).join('');
+  const _set=(sel,html)=>{ const el=$(sel); if(el) el.innerHTML=html; };
+  _set('#taskAssignee',opts); _set('#updDev',opts); _set('#dgDev',opts);
+  _set('#boardDevFilter','<option value="all">All developers</option>'+opts);
+  _set('#logDevFilter','<option value="all">All developers</option>'+opts);
+}
+function openTask(id){
+  fillDevSelects();
+  const t=id?taskById(id):null;
+  $('#taskModalTitle').textContent = t?'Edit task':'New task';
+  $('#taskId').value=t?.id||''; $('#taskTitle').value=t?.title||''; $('#taskDesc').value=t?.desc||'';
+  $('#taskAssignee').value=t?.assignee||'dev1';
+  $('#taskStatus').value=t?.status||'todo'; $('#taskPriority').value=t?.priority||'med';
+  $('#taskDue').value=t?.due||addDays(todayStr(),3); $('#taskEstimate').value=t?.estimate||''; $('#taskTag').value=t?.tag||'';
+  openModal('taskModal');
+}
+$('#taskForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const id=$('#taskId').value;
+  const data={title:$('#taskTitle').value.trim(),desc:$('#taskDesc').value.trim(),assignee:$('#taskAssignee').value,status:$('#taskStatus').value,priority:$('#taskPriority').value,due:$('#taskDue').value,estimate:+$('#taskEstimate').value||null,tag:$('#taskTag').value.trim()};
+  if(id) Object.assign(taskById(id),data); else state.tasks.push({id:uid(),createdAt:todayStr(),...data});
+  save(); closeModal('taskModal'); renderAll(); toast('✅ Task saved — now visible on board & dashboard');
+});
+
+/* ---- Log Today's Work = a checklist of the day's Goal / Tasks / Expected Deliverable (per dev) ----
+   Tick tasks done today -> Save -> each newly ticked task becomes Done + a logged-work entry. */
+let logFocusDevId = null;
+let logDevId = null; // the ONE developer this Log form is allowed to log for
+let logFocusTaskId = null;
+let logPlanIdCtx = null;
+function logPlan(){
+  if(logPlanIdCtx){ const pl = planById(logPlanIdCtx); if(pl) return pl; }
+  const date = $('#updDate')?.value || todayStr();
+  return planForDate(date) || (date===todayStr() ? currentPlan() : null);
+}
+function newlyCheckedInputs(){
+  return [...document.querySelectorAll('.logCheck:checked:not(:disabled)')].filter(inp=>{
+    const t = taskById(inp.value);
+    return inp.dataset.dev===logDevId && t && t.assignee===logDevId;
+  });
+}
+function updateLogCheckSummary(){
+  const news = newlyCheckedInputs();
+  const already = document.querySelectorAll('.logCheck:disabled:checked').length;
+  const box = $('#logCheckSummary');
+  if(box) box.textContent = news.length
+    ? '✅ ' + news.length + ' task(s) ticked to log as Done' + (already ? ' • ' + already + ' already Done' : '')
+    : '⬜ 0 newly ticked' + (already ? ' • ' + already + ' already Done' : ' — tick at least one task');
+  const btn = $('#logSaveBtn');
+  if(btn) btn.textContent = news.length ? 'Save checklist (' + news.length + ') — mark ticked Done & log work' : 'Save checklist';
+  state.devs.forEach(d=>{
+    const badge = document.querySelector('[data-count-for="' + d.id + '"]');
+    if(badge){
+      const n = news.filter(i=>i.dataset.dev===d.id).length;
+      const done = document.querySelectorAll('.logCheck:disabled:checked[data-dev="' + d.id + '"]').length;
+      badge.textContent = (n ? n + ' ticked' : '0 ticked') + (done ? ' • ' + done + ' already Done' : '');
+    }
+  });
+}
+function renderLogChecklist(){
+  const box = $('#updGoalContext'); if(!box) return;
+  const logDate = $('#updDate').value || todayStr();
+  const owner = devById(logDevId || logFocusDevId || activeDevPageId || state.devs[0].id);
+  logDevId = owner.id;
+  const plan = logPlan();
+  if(!plan){
+    box.innerHTML = '<div class="updNoGoal">📄 <b>No Goal/Tasks found for ' + fmtDateFull(logDate) + '.</b><br>Whatever each developer adds with <b>＋ Add New Task</b> (Goal, Tasks, Expected Deliverable) becomes this checklist.<br>' +
+      '<button type="button" class="btn small primary" style="margin-top:9px" onclick="closeModal(\'updateModal\');openDevGoal(\'' + owner.id + '\',\'' + logDate + '\')">＋ Add New Task — ' + esc(owner.name) + '</button></div>';
+    updateLogCheckSummary();
+    return;
+  }
+  ensurePlanTasks(plan);
+  const focusTask = logFocusTaskId ? taskById(logFocusTaskId) : null;
+  const focusDev = owner.id;
+  let html = '<div class="updGoalHead"><b>' + esc(owner.name) + '\'s checklist • ' + fmtDateFull(plan.date) + '</b><span class="badge doing">🔒 ' + esc(owner.name) + ' only</span>' +
+    (plan.date!==logDate ? '<span class="badge">logging date: ' + fmtDate(logDate) + '</span>' : '') + '</div>';
+
+  const ownerAssignment = (plan.assignments||[]).find(x=>x.devId===owner.id) || {devId:owner.id, area:owner.role||'Development', mainGoal:'', expectedDeliverable:'', items:[]};
+  [ownerAssignment].forEach(a=>{
+    const d = devById(a.devId);
+    const st = assignmentStats(plan,a);
+    html += '<details class="updDevGoal"' + (a.devId===focusDev?' open':'') + '>' +
+      '<summary><span class="miniAvatar" style="width:30px;height:30px;background:' + d.color + '">' + esc(initials(d.name)) + '</span>' +
+      '<span style="flex:1"><b>' + esc(d.name) + ' – ' + esc(a.area||'') + '</b></span>' +
+      '<span class="badge" data-count-for="' + d.id + '">0 ticked</span></summary>' +
+      '<div class="updDevGoalBody">' +
+        '<div class="updMiniLabel">🎯 Goal</div><p>' + esc(a.mainGoal || 'No goal submitted yet for this day.') + '</p>' +
+        '<div class="checkAllRow"><div class="updMiniLabel" style="margin:10px 0 5px">✅ Tasks — tick what was done today</div>' +
+        ((a.items||[]).length ? '<span><button type="button" class="btn small" data-check-all="' + d.id + '">Tick all</button> <button type="button" class="btn small" data-clear-all="' + d.id + '">Clear</button></span>' : '') + '</div>';
+
+    if((a.items||[]).length){
+      (a.items||[]).forEach((item,i)=>{
+        const t = taskForItem(plan,a,item);
+        const isDone = t.status==='done';
+        const preChecked = isDone || t.id===logFocusTaskId;
+        html += '<div class="checkTaskRow' + (preChecked?' checked':'') + (isDone?' alreadyDone':'') + '">' +
+          '<label class="checkMain">' +
+            '<input type="checkbox" class="logCheck" value="' + t.id + '" data-dev="' + d.id + '"' + (preChecked?' checked':'') + (isDone?' disabled':'') + '>' +
+            '<span class="itemNum">' + (isDone?'✓':(i+1)) + '</span>' +
+            '<span class="checkTaskText" style="flex:1">' + esc(item.text) + '</span>' +
+            statusBadge(t.status) +
+          '</label>' +
+          (isDone
+            ? '<div class="muted smallText" style="margin:6px 0 0 34px">Already logged / Done — locked.</div>'
+            : '<div class="logDetails">' +
+                '<input class="logNote" placeholder="What was done on this task? (optional)">' +
+                '<input class="logHours" type="number" min="0" step="0.25" placeholder="Hours">' +
+              '</div>') +
+        '</div>';
+      });
+    } else {
+      html += '<p class="muted smallText">No tasks submitted yet.</p>' +
+        '<button type="button" class="btn small primary" style="margin-top:7px" onclick="closeModal(\'updateModal\');openDevGoal(\'' + a.devId + '\',\'' + plan.date + '\',\'' + plan.id + '\')">＋ Add New Task — ' + esc(d.name) + '</button>';
+    }
+    html += '<div class="updMiniLabel">🎁 Expected Deliverable</div>' + numberedExpectedDeliverableHTML(a.expectedDeliverable) + '</div></details>';
+  });
+
+  box.innerHTML = html;
+  updateLogCheckSummary();
+}
+$('#updGoalContext').addEventListener('change', e=>{
+  if(e.target.classList?.contains('logCheck') && e.target.dataset.dev!==logDevId){ e.target.checked=false; toast('🔒 This checklist is for ' + devById(logDevId).name + ' only'); return; }
+  if(e.target.classList?.contains('logCheck')){
+    const row = e.target.closest('.checkTaskRow');
+    if(row) row.classList.toggle('checked', e.target.checked);
+    if(e.target.checked){ const note = row?.querySelector('.logNote'); if(note) note.focus({preventScroll:true}); }
+    updateLogCheckSummary();
+  }
+});
+$('#updGoalContext').addEventListener('click', e=>{
+  const allBtn = e.target.closest('[data-check-all]');
+  const clearBtn = e.target.closest('[data-clear-all]');
+  if(allBtn || clearBtn){
+    const devId = (allBtn||clearBtn).dataset.checkAll || (allBtn||clearBtn).dataset.clearAll;
+    document.querySelectorAll('.logCheck:not(:disabled)[data-dev="' + devId + '"]').forEach(inp=>{
+      inp.checked = !!allBtn;
+      inp.closest('.checkTaskRow')?.classList.toggle('checked', inp.checked);
+    });
+    updateLogCheckSummary();
+  }
+});
+$('#updDate').addEventListener('change', ()=>{
+  logPlanIdCtx = null;
+  logFocusTaskId = null;
+  renderLogChecklist();
+});
+function openUpdate(taskId, devId, planId){
+  currentShot=''; const prev=$('#shotPreview'); if(prev) prev.style.display='none';
+  const file=$('#updFile'); if(file) file.value='';
+  const shotUrl=$('#updShotUrl'); if(shotUrl) shotUrl.value='';
+  const demo=$('#updDemo'); if(demo) demo.value='';
+  const gh=$('#updGithub'); if(gh) gh.value='';
+  const task = taskId ? taskById(taskId) : null;
+  logFocusTaskId = taskId || null;
+  logDevId = task?.assignee || devId || activeDevPageId || state.devs[0]?.id || null;
+  logFocusDevId = logDevId;
+  const ownerForLog = devById(logDevId);
+  const logTitle = $('#logModalTitle'); if(logTitle) logTitle.textContent = "✅ Log Today's Work — " + ownerForLog.name;
+  const logIntro = $('#logModalIntro'); if(logIntro) logIntro.innerHTML = 'This checklist is for <b>' + esc(ownerForLog.name) + ' only</b> — only ' + esc(ownerForLog.name) + '\'s tasks are shown and can be ticked here. Tick the tasks done today; on save they are marked <b>Done</b> and logged under ' + esc(ownerForLog.name) + '. Tasks already Done are ticked and locked.';
+  logPlanIdCtx = planId || task?.planId || null;
+  const taskPlan = logPlanIdCtx ? planById(logPlanIdCtx) : null;
+  $('#updDate').value = taskPlan?.date || planForDate(todayStr())?.date || currentPlan()?.date || todayStr();
+  renderLogChecklist();
+  openModal('updateModal');
+}
+// screenshot: file -> resized data URL (keeps localStorage small)
+$('#updFile').addEventListener('change', e=>{
+  const file=e.target.files[0]; if(!file) return;
+  const img=new Image(); const url=URL.createObjectURL(file);
+  img.onload=()=>{ const scale=Math.min(1,1000/img.width); const c=document.createElement('canvas'); c.width=Math.round(img.width*scale); c.height=Math.round(img.height*scale); c.getContext('2d').drawImage(img,0,0,c.width,c.height); currentShot=c.toDataURL('image/jpeg',.82); URL.revokeObjectURL(url); const p=$('#shotPreview'); p.src=currentShot; p.style.display='block'; };
+  img.src=url;
+});
+$('#updShotUrl').addEventListener('input', e=>{ const v=e.target.value.trim(); if(v){ currentShot=v; const p=$('#shotPreview'); p.src=v; p.style.display='block'; } });
+$('#updateForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const rawChecked = [...document.querySelectorAll('.logCheck:checked:not(:disabled)')];
+  const notMine = rawChecked.filter(inp=>{ const t=taskById(inp.value); return inp.dataset.dev!==logDevId || !t || t.assignee!==logDevId; });
+  if(notMine.length){ toast('🔒 You can only log work for ' + devById(logDevId).name + ' in this checklist'); return; }
+  const inputs = newlyCheckedInputs();
+  if(!inputs.length){ toast('⬜ Tick at least one of ' + devById(logDevId).name + '\'s tasks that was done today, then save the checklist'); return; }
+  const date = $('#updDate').value || todayStr();
+  const demoLink = $('#updDemo').value.trim();
+  const githubLink = $('#updGithub').value.trim();
+  const screenshot = currentShot || $('#updShotUrl').value.trim();
+  let logged = 0;
+  inputs.forEach(inp=>{
+    const t = taskById(inp.value); if(!t) return;
+    const row = inp.closest('.checkTaskRow');
+    const note = row?.querySelector('.logNote')?.value.trim() || '';
+    const hours = +(row?.querySelector('.logHours')?.value) || 0;
+    t.status = 'done';
+    state.updates.push({ id:uid(), taskId:t.id, devId:logDevId, date, hours,
+      text: note || 'Completed — checked off in today\'s work checklist.',
+      demoLink, githubLink, blocker:'', nextStep:'', screenshot, createdAt:new Date().toISOString() });
+    logged++;
+  });
+  save(); closeModal('updateModal'); setDevPage(logDevId);
+  toast('✅ Checklist saved: ' + logged + ' task(s) marked Done and logged under ' + devById(logDevId).name + '.');
+});
+
+function openDetail(id){
+  const t=taskById(id); if(!t) return;
+  const ups=state.updates.filter(u=>u.taskId===id).sort((a,b)=>b.date.localeCompare(a.date));
+  $('#detailBody').innerHTML=`
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">${statusBadge(t.status)}<span class="badge ${t.priority}">${t.priority}</span>${devBadge(t.assignee)}<span class="badge">📅 Due ${fmtDate(t.due)}</span>${isOverdue(t)?'<span class="badge overdue">OVERDUE</span>':''}<span class="badge">⏱️ ${hoursForTask(id)}h logged${t.estimate?' / '+t.estimate+'h est.':''}</span></div>
+    <h2 style="margin-top:12px">${esc(t.title)}</h2><p style="line-height:1.6">${esc(t.desc||'No description.')}</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin:14px 0"><button class="btn green small" onclick="closeModal('detailModal');openUpdate('${t.id}')">✍️ Log work on this task</button>
+    <button class="btn small" onclick="closeModal('detailModal');openTask('${t.id}')">Edit task</button>
+    ${t.status!=='done'?`<button class="btn small primary" onclick="markDone('${t.id}')">✅ Mark done</button>`:''}</div>
+    <h3>Proof & history (${ups.length} update${ups.length===1?'':'s'})</h3>
+    ${ups.length? ups.map(u=>`<div class="feedItem">${u.screenshot?`<img class="thumb" src="${esc(u.screenshot)}" onclick="openLightbox(this.src)">`:''}<div><b>${fmtDateFull(u.date)}</b> <span class="muted smallText">— ${esc(devById(u.devId).name)} • ${u.hours||0}h</span><p class="smallText" style="margin:5px 0">${esc(u.text)}</p>${linkPills(u)}${u.blocker?`<div class="blockerBox">🚧 ${esc(u.blocker)}</div>`:''}${u.nextStep?`<div class="nextBox">➡️ Next: ${esc(u.nextStep)}</div>`:''}</div></div>`).join('') : '<p class="muted">No proof logged yet for this task.</p>'}
+    <div class="modalBtns"><button class="btn" onclick="closeModal('detailModal')">Close</button></div>`;
+  openModal('detailModal');
+}
+function markDone(id){ taskById(id).status='done'; save(); closeModal('detailModal'); renderAll(); toast('✅ Marked done'); }
+
+/* ============ Settings / help / data ============ */
+function openSettings(){ $('#setProject').value=state.project; $('#setDev1Name').value=state.devs[0].name; $('#setDev1Role').value=state.devs[0].role||''; $('#setDev2Name').value=state.devs[1].name; $('#setDev2Role').value=state.devs[1].role||''; openModal('settingsModal'); }
+$('#settingsForm').addEventListener('submit',e=>{ e.preventDefault(); state.project=$('#setProject').value.trim()||state.project; state.devs[0].name=$('#setDev1Name').value.trim()||state.devs[0].name; state.devs[0].role=$('#setDev1Role').value.trim(); state.devs[1].name=$('#setDev2Name').value.trim()||state.devs[1].name; state.devs[1].role=$('#setDev2Role').value.trim(); save(); closeModal('settingsModal'); renderAll(); toast('⚙️ Names updated everywhere'); });
+function openHelp(){ openModal('helpModal'); }
+function resetDemo(){ if(confirm('Reset to fresh demo data? Your current tasks/updates in this browser will be replaced. Export a backup first if you need them.')){ state=seed(); save(); renderAll(); toast('↺ Demo data reset'); } }
+function exportJSON(){
+  const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='shiplog-backup-'+todayStr()+'.json'; a.click(); URL.revokeObjectURL(a.href);
+  toast('⬇️ Backup downloaded — send it to your boss/teammate, they click Import');
+}
+$('#importFile')?.addEventListener('change',e=>{
+  const f=e.target.files[0]; if(!f) return;
+  f.text().then(txt=>{ const data=JSON.parse(txt); if(!data.tasks||!data.devs) throw new Error('bad'); state=data; save(); renderAll(); toast('⬆️ Import complete — you are now seeing the shared state'); }).catch(()=>toast('❌ That file is not a ShipLog backup'));
+  e.target.value='';
+});
+
+/* ============ Daily Goal documents ============ */
+function sortedPlans(){ return [...(state.plans||[])].sort((a,b)=>b.date.localeCompare(a.date)); }
+function planById(id){ return (state.plans||[]).find(p=>p.id===id); }
+function currentPlan(){
+  if(selectedPlanId && planById(selectedPlanId)) return planById(selectedPlanId);
+  const plans=sortedPlans();
+  const pick = plans.find(p=>p.date===todayStr()) || plans[0] || null;
+  selectedPlanId = pick ? pick.id : null;
+  return pick;
+}
+function taskForItem(plan, assignment, item){
+  let t = state.tasks.find(x=>x.planId===plan.id && x.planItemId===item.id);
+  if(!t){
+    t = {id:uid(), title:item.text, desc:assignment.area+' — '+plan.title+'. Main Goal: '+assignment.mainGoal, assignee:assignment.devId, status:'todo', priority:'med', due:plan.date, estimate:null, tag:assignment.area, planId:plan.id, planItemId:item.id, createdAt:plan.date};
+    state.tasks.push(t);
+  } else { t.title=item.text; t.assignee=assignment.devId; t.due=plan.date; t.tag=assignment.area; }
+  return t;
+}
+function ensurePlanTasks(plan){ (plan.assignments||[]).forEach(a=>(a.items||[]).forEach(item=>taskForItem(plan,a,item))); }
+function assignmentStats(plan,a){
+  const list=(a.items||[]).map(item=>taskForItem(plan,a,item));
+  return { total:list.length, done:list.filter(t=>t.status==='done').length, doing:list.filter(t=>t.status==='doing').length, tasks:list };
+}
+function planStats(plan){
+  let total=0,done=0,doing=0;
+  (plan.assignments||[]).forEach(a=>{ const st=assignmentStats(plan,a); total+=st.total; done+=st.done; doing+=st.doing; });
+  return {total,done,doing,pct: total?Math.round(done/total*100):0};
+}
+function setItemStatus(taskId, status){
+  const t=taskById(taskId); if(!t) return;
+  t.status=status; save(); renderAll();
+  toast(status==='done' ? '✅ Task marked Done — now Log proof (screenshot/link) so the boss can verify it' : 'Status updated: '+status);
+  showView('goal');
+}
+/* ============ Developer pages: one page per dev (Emmanuel / David) ============ */
+function devIdFromHash(){
+  try{
+    const h = decodeURIComponent((location.hash||'').replace(/^#/,'')).trim().toLowerCase();
+    return state.devs.find(d=>d.id.toLowerCase()===h || d.name.toLowerCase()===h)?.id || null;
+  }catch(e){ return null; }
+}
+let activeDevPageId = devIdFromHash() || (()=>{ try{ const id=localStorage.getItem('shiplog_activeDevPage'); return state.devs.some(d=>d.id===id) ? id : null; }catch(e){ return null; } })() || state.devs[0]?.id || 'dev1';
+let activePage = (()=>{ const hid=devIdFromHash(); if(hid) return hid; try{ const h=decodeURIComponent((location.hash||'').replace(/^#/,'')).trim().toLowerCase(); if(h==='project') return 'project'; const stored=localStorage.getItem('shiplog_activePage'); if(stored==='project' || state.devs.some(d=>d.id===stored)) return stored; }catch(e){} return 'project'; })();
+if(activePage!=='project') activeDevPageId = activePage;
+function activeDev(){
+  if(!state.devs.some(d=>d.id===activeDevPageId)) activeDevPageId = state.devs[0]?.id || activeDevPageId;
+  return devById(activeDevPageId);
+}
+function renderDevTabs(){
+  const current = activeDev();
+  const nav = $('#devTabs');
+  if(nav){
+    const info = ensureProjectInfo();
+    const projectBtn =
+      '<button type="button" class="devTab' + (activePage==='project' ? ' active' : '') + '" onclick="setProjectPage()">' +
+        '<span class="avatar" style="background:linear-gradient(135deg,#4f46e5,#7c3aed)">🚀</span>' +
+        '<span><b>' + esc(info.title) + '</b><span class="role">Main Goal &amp; Timeline</span></span>' +
+        '<span class="viewLbl">' + (activePage==='project' ? '● OPEN' : 'View page →') + '</span>' +
+      '</button>';
+    nav.innerHTML = projectBtn + state.devs.map(d=>
+      '<button type="button" class="devTab' + (activePage===d.id ? ' active' : '') + '" onclick="setDevPage(\'' + d.id + '\')">' +
+        '<span class="avatar" style="background:' + d.color + '">' + esc(initials(d.name)) + '</span>' +
+        '<span><b>' + esc(d.name) + '</b><span class="role">' + esc(d.role||'Developer') + '</span></span>' +
+        '<span class="viewLbl">' + (activePage===d.id ? '● OPEN' : 'View page →') + '</span>' +
+      '</button>').join('');
+  }
+  const logBtn = $('#topLogBtn'); if(logBtn) logBtn.textContent = "✍️ Log Today's Work — " + current.name;
+  const addBtn = $('#topAddBtn'); if(addBtn) addBtn.textContent = '＋ Add New Task — ' + current.name;
+}
+function setDevPage(devId){
+  if(!state.devs.some(d=>d.id===devId)) return;
+  activeDevPageId = devId;
+  activePage = devId;
+  try{ localStorage.setItem('shiplog_activeDevPage', devId); localStorage.setItem('shiplog_activePage', devId); }catch(e){}
+  try{ history.replaceState(null, '', '#' + encodeURIComponent(devById(devId).name)); }catch(e){}
+  renderAll();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function setProjectPage(){
+  activePage = 'project';
+  try{ localStorage.setItem('shiplog_activePage', 'project'); }catch(e){}
+  try{ history.replaceState(null, '', '#Project'); }catch(e){}
+  renderAll();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+window.addEventListener('hashchange', ()=>{
+  const id = devIdFromHash();
+  let isProject = false;
+  try{ isProject = decodeURIComponent((location.hash||'').replace(/^#/,'')).trim().toLowerCase()==='project'; }catch(e){}
+  if(isProject && activePage!=='project'){ activePage='project'; try{ localStorage.setItem('shiplog_activePage','project'); }catch(e){} renderAll(); return; }
+  if(id && activePage!==id){ activePage=id; activeDevPageId=id; try{ localStorage.setItem('shiplog_activeDevPage', id); localStorage.setItem('shiplog_activePage', id); }catch(e){} renderAll(); }
+});
+
+/* ============ Project page: Title / Main Goal / General Timeline ============ */
+function defaultProjectInfo(title){
+  const day = (offset)=> addDays(todayStr(), offset);
+  return {
+    title: title || 'Starfetch Web Portal',
+    mainGoal: 'Build a secure investor web portal for Starfetch that allows investors to register, complete onboarding and log in to a responsive dashboard where they can see their portfolio value, investment summary, recent activities and notifications — on a foundation ready for KYC, portfolio management and investment transactions.',
+    startDate: day(-3),
+    finishDate: day(49)
+  };
+}
+function parseTimelineDates(item){
+  if(item?.startDate || item?.endDate) return { start:item.startDate || item.endDate || '', end:item.endDate || item.startDate || '' };
+  const raw = String(item?.when || '');
+  const iso = raw.match(/\d{4}-\d{2}-\d{2}/g);
+  if(iso?.length) return { start:iso[0], end:iso[1] || iso[0] };
+  const monthNames = {jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
+  const found = [];
+  const reA = /\b(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+(\d{1,2})(?:st|nd|rd|th)?(?:,?\s*(\d{4}))?/gi;
+  const reB = /\b(\d{1,2})(?:st|nd|rd|th)?\s+(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)(?:,?\s*(\d{4}))?/gi;
+  let m;
+  while((m = reA.exec(raw))) found.push({index:m.index, month:monthNames[m[1].slice(0,3).toLowerCase()], day:+m[2], year:m[3] ? +m[3] : null});
+  while((m = reB.exec(raw))) found.push({index:m.index, month:monthNames[m[2].slice(0,3).toLowerCase()], day:+m[1], year:m[3] ? +m[3] : null});
+  found.sort((a,b)=>a.index-b.index);
+  if(!found.length) return {start:'', end:''};
+  const baseYear = +(todayStr().slice(0,4));
+  const toStr = (f)=> dstr(new Date(f.year || baseYear, f.month, f.day));
+  const first = toStr(found[0]);
+  let last = toStr(found[found.length-1]);
+  if(found.length>1 && !found[found.length-1].year && last < first){
+    const f = found[found.length-1];
+    last = dstr(new Date(baseYear+1, f.month, f.day));
+  }
+  return { start:first, end:last };
+}
+function isValidDateString(value){
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(value || '')) return false;
+  const d = new Date(value + 'T12:00:00');
+  return !Number.isNaN(d.getTime()) && dstr(d) === value;
+}
+function ensureProjectInfo(){
+  const def = defaultProjectInfo(state?.project || 'Starfetch Web Portal');
+  if(!state.projectInfo || typeof state.projectInfo!=='object'){
+    state.projectInfo = def;
+  } else {
+    if(!state.projectInfo.title) state.projectInfo.title = def.title;
+    if(!state.projectInfo.mainGoal) state.projectInfo.mainGoal = def.mainGoal;
+
+    const legacyRanges = Array.isArray(state.projectInfo.timeline)
+      ? state.projectInfo.timeline.map(item=>parseTimelineDates(item || {})).filter(x=>x.start || x.end)
+      : [];
+    const legacyStarts = legacyRanges.map(x=>x.start || x.end).filter(isValidDateString).sort();
+    const legacyEnds = legacyRanges.map(x=>x.end || x.start).filter(isValidDateString).sort();
+
+    if(!isValidDateString(state.projectInfo.startDate)){
+      state.projectInfo.startDate = legacyStarts[0] || def.startDate;
+    }
+    if(!isValidDateString(state.projectInfo.finishDate)){
+      state.projectInfo.finishDate = isValidDateString(state.projectInfo.endDate)
+        ? state.projectInfo.endDate
+        : (legacyEnds[legacyEnds.length-1] || def.finishDate);
+    }
+  }
+  if(state.projectInfo.finishDate < state.projectInfo.startDate){
+    state.projectInfo.finishDate = state.projectInfo.startDate;
+  }
+  delete state.projectInfo.timeline;
+  delete state.projectInfo.endDate;
+  state.project = state.projectInfo.title;
+  return state.projectInfo;
+}
+function daysBetweenDates(start, finish){
+  return Math.round((new Date(finish + 'T12:00:00') - new Date(start + 'T12:00:00')) / 86400000);
+}
+function projectTimelineStatus(info){
+  const today = todayStr();
+  if(today < info.startDate) return {label:'Not started yet', badge:'todo'};
+  if(today > info.finishDate) return {label:'Finish date reached', badge:'done'};
+  return {label:'In progress', badge:'doing'};
+}
+function renderProjectPage(){
+  const sec = $('#view-project'), goalSec = $('#view-goal'), wrap = $('#projectPage');
+  if(sec) sec.style.display = activePage==='project' ? 'block' : 'none';
+  if(goalSec) goalSec.style.display = activePage==='project' ? 'none' : 'block';
+  if(!wrap) return;
+  const info = ensureProjectInfo();
+  const status = projectTimelineStatus(info);
+  const duration = Math.max(1, daysBetweenDates(info.startDate, info.finishDate) + 1);
+  wrap.innerHTML =
+    '<div class="projectHero"><div style="flex:1;min-width:260px">' +
+      '<div class="eyebrow">Project</div>' +
+      '<h1>' + esc(info.title) + '</h1>' +
+    '</div>' +
+    '<button class="btn noPrint" onclick="openProjectEdit()">✏️ Edit title, goal &amp; timeline</button></div>' +
+    '<div class="card projectGoalCard"><h2>🎯 Main Goal</h2><p>' + esc(info.mainGoal) + '</p></div>' +
+    '<div class="card projectTimelineCard"><h2>🗓️ Project Timeline</h2>' +
+      '<p class="muted" style="margin:0">General timeline for the whole project.</p>' +
+      '<div class="projectDates">' +
+        '<div class="projectDate"><span>▶️ Start Date</span><b>' + esc(fmtDateFull(info.startDate)) + '</b></div>' +
+        '<div class="timelineArrow">→</div>' +
+        '<div class="projectDate finish"><span>🏁 Finish Date</span><b>' + esc(fmtDateFull(info.finishDate)) + '</b></div>' +
+      '</div>' +
+      '<div class="timelineSummary"><span class="badge">📆 ' + duration + ' day' + (duration===1 ? '' : 's') + ' overall</span>' +
+      '<span class="badge ' + status.badge + '">' + esc(status.label) + '</span></div>' +
+    '</div>';
+}
+function openProjectEdit(){
+  const info = ensureProjectInfo();
+  $('#projTitle').value = info.title || '';
+  $('#projGoal').value = info.mainGoal || '';
+  $('#projStartDate').value = info.startDate || '';
+  $('#projFinishDate').value = info.finishDate || '';
+  openModal('projectModal');
+}
+$('#projectForm')?.addEventListener('submit', e=>{
+  e.preventDefault();
+  const title = $('#projTitle').value.trim();
+  const mainGoal = $('#projGoal').value.trim();
+  const startDate = $('#projStartDate').value;
+  const finishDate = $('#projFinishDate').value;
+  if(!title || !mainGoal){ toast('Project title and main goal are required'); return; }
+  if(!startDate || !finishDate){ toast('Select both the Project Start Date and Project Finish Date'); return; }
+  if(finishDate < startDate){ toast('Project Finish Date must be on or after the Project Start Date'); return; }
+  state.projectInfo = { title, mainGoal, startDate, finishDate };
+  state.project = title;
+  activePage = 'project';
+  try{ localStorage.setItem('shiplog_activePage','project'); }catch(err){}
+  save(); closeModal('projectModal'); renderAll();
+  toast('🚀 Project page saved: title, main goal & general timeline.');
+});
+
+function renderGoal(){
+  const wrap=$('#goalDoc'); if(!wrap) return;
+  const plans=sortedPlans();
+  const sel=$('#planSelect');
+  const plan=currentPlan();
+  const pageDev = activeDev();
+  renderDevTabs();
+  if(sel) sel.innerHTML = plans.length ? plans.map(p=>`<option value="${p.id}" ${plan&&p.id===plan.id?'selected':''}>${fmtDateFull(p.date)} — ${esc(p.title)}</option>`).join('') : '<option value="">No Daily Goal yet</option>';
+  const strip=$('#todayGoalStrip');
+  if(!plan){
+    wrap.innerHTML = state.devs.filter(d=>d.id===pageDev.id).map(d=>`<div class="assignCard">
+      <div class="assignHead"><div class="avatar" style="background:${d.color}">${esc(initials(d.name))}</div>
+        <div style="flex:1;min-width:220px"><h2>${esc(d.name)}</h2><div class="muted smallText">${esc(d.role||'Developer')} • ${fmtDate(todayStr())}</div></div>
+        <button class="btn small primary noPrint" onclick="openDevGoal('${d.id}')">＋ Add New Task</button>
+        <button class="btn small green noPrint" onclick="openUpdate(null,'${d.id}')">✍️ Log Today's Work</button>
+      </div>
+      <div class="assignBody"><p class="muted">No goal or tasks yet today. Click <b>＋ Add New Task</b> — fill only Goal, Tasks and Expected Deliverable.</p></div>
+    </div>`).join('');
+    if(strip) strip.innerHTML='';
+    return;
+  }
+  ensurePlanTasks(plan); save();
+  const ps=planStats(plan);
+  const isToday = plan.date===todayStr();
+  let html = '';
+  const orderedPlans = [plan, ...plans.filter(pp=>pp.id!==plan.id)];
+  let prevHeadingShown = false;
+  orderedPlans.forEach((plan, planIndex)=>{
+    ensurePlanTasks(plan);
+    const foundAssignment = (plan.assignments||[]).find(x=>x.devId===pageDev.id);
+    const a = foundAssignment || (planIndex===0 ? {devId:pageDev.id, area:pageDev.role||'Development', mainGoal:'', expectedDeliverable:'', items:[]} : null);
+    if(!a) return;
+    if(planIndex>0 && !a.mainGoal && !(a.items||[]).length && !a.expectedDeliverable) return;
+    if(planIndex>0 && !prevHeadingShown){ html += '<div class="sectionHead"><h2>Previous days — ' + esc(pageDev.name) + '</h2></div>'; prevHeadingShown = true; }
+    const d=devById(a.devId); const st=assignmentStats(plan,a);
+    const pct=st.total?Math.round(st.done/st.total*100):0;
+    const taskIds=new Set(st.tasks.map(t=>t.id));
+    const evidence=state.updates.filter(u=>taskIds.has(u.taskId)).sort((x,y)=>y.date.localeCompare(x.date));
+    html += `<div class="assignCard">
+      <div class="assignHead"><div class="avatar" style="background:${d.color}">${esc(initials(d.name))}</div>
+        <div style="flex:1;min-width:220px"><h2>${esc(d.name)}</h2><div class="muted smallText">${esc(a.area || d.role || 'Developer')} • ${fmtDate(plan.date)}</div></div>
+        <button class="btn small primary noPrint" onclick="openDevGoal('${d.id}','${plan.date}','${plan.id}')">＋ Add New Task</button>
+        <button class="btn small green noPrint" onclick="openUpdate(null,'${d.id}','${plan.id}')">✍️ Log Today's Work</button>
+      </div>
+      <div class="assignBody">
+        <h3>Goal</h3><p>${esc(a.mainGoal || '⚠️ No goal submitted yet for this day — click “＋ Add New Task” above — fill only Goal, Tasks and Expected Deliverable.')}</p>
+        <h3>Tasks</h3>
+        <div class="goalItems">`;
+    (a.items||[]).forEach((item,i)=>{
+      const t=taskForItem(plan,a,item);
+      const ups=state.updates.filter(u=>u.taskId===t.id);
+      const hrs=hoursForTask(t.id);
+      html += `<div class="goalItem ${t.status}">
+        <div class="itemNum">${t.status==='done'?'✓':(i+1)}</div>
+        <div class="itemText">${esc(item.text)}
+          <div class="itemMeta">${statusBadge(t.status)}</div>
+        </div>
+      </div>`;
+    });
+    html += `</div>
+        <div class="deliverableBox"><h3 style="margin-top:0">Expected Deliverable — by the end of the day</h3>${numberedExpectedDeliverableHTML(a.expectedDeliverable)}</div>
+        <div class="actualBox"><h3 style="margin-top:0">Logged Work / Proof</h3>`;
+    if(evidence.length){
+      html += evidence.map(u=>`<div class="feedItem">${u.screenshot?`<img class="thumb" src="${esc(u.screenshot)}" onclick="openLightbox(this.src)">`:''}<div style="flex:1;min-width:0"><b>${esc(taskById(u.taskId)?.title||'Task')}</b> <span class="muted smallText">• ${fmtDate(u.date)} • ${u.hours||0}h</span><p class="smallText" style="margin:4px 0 0">${esc(u.text)}</p>${linkPills(u)}${u.blocker?`<div class="blockerBox">🚧 Blocker: ${esc(u.blocker)}</div>`:''}${u.nextStep?`<div class="nextBox">➡️ Next: ${esc(u.nextStep)}</div>`:''}</div></div>`).join('');
+    } else {
+      html += `<p class="muted smallText" style="margin:0">No work logged yet for ${esc(d.name)}. Use <b>✍️ Log Today's Work</b> to add what was done, with a screenshot, live/demo link or GitHub link — it will appear here.</p>`;
+    }
+    html += `</div></div></div>`;
+  });
+
+  wrap.innerHTML=html;
+
+  if(strip){
+    const tp = plans.find(p=>p.date===todayStr()) || plan;
+    const tps = planStats(tp);
+    strip.innerHTML = `<div class="card todayGoalCard"><div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+      <div style="flex:1;min-width:280px"><div class="eyebrow">Today's Daily Goal Document</div><b style="font-size:18px">${esc(tp.title)}</b>
+      <div class="muted smallText" style="margin-top:3px">${tp.assignments.map(a=>{const st=assignmentStats(tp,a); return esc(devById(a.devId).name)+' ('+esc(a.area)+'): <b>'+st.done+'/'+st.total+' done</b>';}).join(' &nbsp;•&nbsp; ')} &nbsp;•&nbsp; Overall <b>${tps.pct}%</b></div>
+      <div class="progressBar" style="margin-top:9px"><div class="progressFill" style="width:${tps.pct}%"></div></div></div>
+      <button class="btn primary" onclick="selectedPlanId='${tp.id}';renderGoal();showView('goal')">📄 Open document →</button>
+</div></div>`;
+  }
+}
+$('#planSelect')?.addEventListener('change', e=>{ selectedPlanId=e.target.value||null; renderGoal(); });
+
+/* ============ Add New Task — ONLY 3 fields: Goal / Tasks / Expected Deliverable ============
+   Developer + day are NOT form fields. They come from WHERE the button was clicked:
+   - "＋ Add New Task" inside Emmanuel's/David's section (or on his card) -> that developer, that document's date
+   - Header / board button -> first asks "Emmanuel or David?" (whose section to save under); date = today  */
+let dgDevId = 'dev1';
+let dgDateStr = null;
+let dgPlanIdCtx = null;
+function planForDate(dateStrVal){ return sortedPlans().find(p=>p.date===dateStrVal) || null; }
+function dgPlan(){
+  const p = dgPlanIdCtx ? planById(dgPlanIdCtx) : null;
+  return (p && p.date===dgDateStr) ? p : planForDate(dgDateStr);
+}
+function parseTaskLines(raw){ return String(raw||'').split('\n').map(x=>x.replace(/^\s*(?:[-•*]|\d+[.)])\s*/,'').trim()).filter(Boolean); }
+function expectedDeliverableItems(value){ return parseTaskLines(value || ''); }
+function formatExpectedDeliverableForForm(value){ return expectedDeliverableItems(value).map((item,i)=>(i+1)+'. '+item).join('\n'); }
+function numberedExpectedDeliverableHTML(value){
+  const items = expectedDeliverableItems(value);
+  if(!items.length) return '<p style="margin:0">Not stated yet.</p>';
+  return '<ol class="deliverableList">' + items.map(item=>'<li>' + esc(item) + '</li>').join('') + '</ol>';
+}
+function numberedExpectedDeliverableText(value){
+  const items = expectedDeliverableItems(value);
+  return items.length ? items.map((item,i)=>(i+1)+'. '+item).join('\n') : 'Not stated yet.';
+}
+let dgPendingDate = null;
+let dgPendingPlan = null;
+function pickDevForGoal(dateStrVal, planId){
+  dgPendingDate = dateStrVal || todayStr();
+  dgPendingPlan = planId || null;
+  $('#devPickList').innerHTML = state.devs.map(d=>
+    '<button type="button" onclick="closeModal(\'devPickModal\');openDevGoal(\''+d.id+'\',dgPendingDate,dgPendingPlan)" style="display:flex;gap:12px;align-items:center;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:14px 16px;font-size:15px">' +
+      '<span class="avatar" style="background:'+d.color+'">'+esc(initials(d.name))+'</span>' +
+      '<span><b>'+esc(d.name)+'</b><br><span class="muted smallText">'+esc(d.role||'Developer')+'</span></span>' +
+      '<span style="margin-left:auto;font-weight:800">＋ Add</span>' +
+    '</button>').join('');
+  openModal('devPickModal');
+}
+function openDevGoal(devId, dateStrVal, planId){
+  if(!devId){ pickDevForGoal(dateStrVal, planId); return; }
+  dgDevId = devId;
+  dgDateStr = dateStrVal || todayStr();
+  dgPlanIdCtx = planId || null;
+  const d = devById(dgDevId);
+  const plan = dgPlan();
+  const a = plan?.assignments?.find(x=>x.devId===dgDevId);
+  const count = a ? (a.items||[]).length : 0;
+  $('#dgModalTitle').textContent = '＋ Add New Task — ' + d.name;
+  $('#dgContext').innerHTML =
+    '<b>' + esc(d.name) + '</b> (' + esc(d.role||'Developer') + ') &bull; ' + fmtDateFull(dgDateStr) + (dgDateStr===todayStr() ? ' (today)' : '') + '<br>' +
+    (count
+      ? 'You already have <b>' + count + ' task(s)</b> for this day, so <b>Goal</b> and <b>Expected Deliverable</b> are pre-filled from your earlier submission (change them only if they changed). Type <b>only the new task(s)</b> in <b>Tasks</b> — they will be added to your list.'
+      : 'Fill in the 3 fields: <b>Goal</b>, <b>Tasks</b>, <b>Expected Deliverable</b>. This creates your section of the day\'s document.');
+  $('#dgGoal').value = a?.mainGoal || '';
+  $('#dgDeliverable').value = formatExpectedDeliverableForForm(a?.expectedDeliverable || '');
+  $('#dgTasks').value = '';
+  openModal('devGoalModal');
+}
+$('#devGoalForm').addEventListener('submit', e=>{
+  e.preventDefault();
+  const d = devById(dgDevId);
+  const date = dgDateStr || todayStr();
+  const goal = $('#dgGoal').value.trim();                 // Field 1: Goal
+  const lines = parseTaskLines($('#dgTasks').value);      // Field 2: Tasks
+  const deliverableLines = expectedDeliverableItems($('#dgDeliverable').value); // Field 3: numbered Expected Deliverable list
+  const deliverable = deliverableLines.join('\n');
+  if(!goal){ toast('Field 1 (Goal) is empty'); return; }
+  if(!lines.length){ toast('Field 2 (Tasks) is empty — write at least one task, one per line'); return; }
+  if(!deliverableLines.length){ toast('Field 3 (Expected Deliverable) is empty — write at least one deliverable, one per line'); return; }
+
+  let plan = dgPlan();
+  if(!plan){
+    plan = { id:uid(), date, title:'Daily Development Goal – '+state.project,
+      overallObjective:'To deliver the goals stated below for '+state.project+' today.',
+      assignments: state.devs.map(dev=>({devId:dev.id, area:dev.role||'Development', mainGoal:'', expectedDeliverable:'', items:[]})) };
+    state.plans.push(plan);
+  }
+  let a = plan.assignments.find(x=>x.devId===dgDevId);
+  if(!a){ a = {devId:dgDevId, area:d.role||'Development', mainGoal:'', expectedDeliverable:'', items:[]}; plan.assignments.push(a); }
+  a.area = a.area || d.role || 'Development';
+  a.mainGoal = goal;
+  a.expectedDeliverable = deliverable;
+  lines.forEach(text=>a.items.push({id:uid(), text}));   // new tasks are appended; existing tasks/statuses/proof untouched
+
+  selectedPlanId = plan.id;
+  ensurePlanTasks(plan);
+  save(); closeModal('devGoalModal'); setDevPage(d.id);
+  toast('✅ Saved under '+d.name+' for '+fmtDate(date)+': '+lines.length+' new task(s) added ('+a.items.length+' total). Goal & expected deliverable are now in the Daily Goal document.');
+});
+
+function openGoal(id){
+  const plan = id ? planById(id) : null;
+  $('#goalModalTitle').textContent = plan ? 'Edit Daily Goal' : 'New Daily Goal';
+  $('#gGoalId').value = plan?.id||'';
+  $('#gDate').value = plan?.date || todayStr();
+  $('#gTitle').value = plan?.title || ('Daily Development Goal – '+state.project);
+  $('#gOverall').value = plan?.overallObjective || '';
+  state.devs.forEach((d,idx)=>{
+    const n=idx+1; const a=plan?.assignments?.find(x=>x.devId===d.id);
+    $('#gDev'+n+'Heading').textContent = d.name+' – '+(a?.area || d.role || 'Development');
+    $('#gDev'+n+'Area').value = a?.area || d.role || '';
+    $('#gDev'+n+'Goal').value = a?.mainGoal || '';
+    $('#gDev'+n+'Tasks').value = a ? (a.items||[]).map(it=>it.text).join('\n') : '';
+    $('#gDev'+n+'Deliverable').value = a?.expectedDeliverable || '';
+  });
+  openModal('goalModal');
+}
+$('#goalForm').addEventListener('submit', e=>{
+  e.preventDefault();
+  const id=$('#gGoalId').value;
+  const existing = id ? planById(id) : null;
+  const build=(d,n)=>{
+    const old=existing?.assignments?.find(x=>x.devId===d.id);
+    const texts=$('#gDev'+n+'Tasks').value.split('\n').map(x=>x.replace(/^\s*\d+[.)]\s*/,'').trim()).filter(Boolean);
+    return { devId:d.id, area:$('#gDev'+n+'Area').value.trim()||d.role||'Development', mainGoal:$('#gDev'+n+'Goal').value.trim(), expectedDeliverable:$('#gDev'+n+'Deliverable').value.trim(),
+      items: texts.map((text,i)=>({id: old?.items?.[i]?.id || uid(), text})) };
+  };
+  const data={ date:$('#gDate').value||todayStr(), title:$('#gTitle').value.trim(), overallObjective:$('#gOverall').value.trim(), assignments: state.devs.map((d,i)=>build(d,i+1)) };
+  let plan;
+  if(existing){
+    const keepIds=new Set(data.assignments.flatMap(a=>a.items.map(it=>it.id)));
+    state.tasks.forEach(t=>{ if(t.planId===existing.id && !keepIds.has(t.planItemId)){ if(state.updates.some(u=>u.taskId===t.id)){ delete t.planId; delete t.planItemId; } else t._remove=true; } });
+    state.tasks=state.tasks.filter(t=>!t._remove);
+    Object.assign(existing, data); plan=existing;
+  } else {
+    plan={id:uid(), ...data}; state.plans.push(plan);
+  }
+  selectedPlanId=plan.id; ensurePlanTasks(plan);
+  save(); closeModal('goalModal'); renderAll(); showView('goal');
+  toast('📄 Daily Goal saved — every numbered task is now trackable with proof');
+});
+function duplicatePlan(){
+  const plan=currentPlan(); if(!plan){ toast('Create a Daily Goal first'); return; }
+  const copy=JSON.parse(JSON.stringify(plan));
+  copy.id=uid(); copy.date=addDays(todayStr(),1);
+  copy.assignments.forEach(a=>a.items.forEach(it=>it.id=uid()));
+  state.plans.push(copy); selectedPlanId=copy.id; ensurePlanTasks(copy);
+  state.tasks.forEach(t=>{ if(t.planId===copy.id) t.status='todo'; });
+  save(); renderAll(); showView('goal');
+  toast('⧉ Duplicated for tomorrow ('+fmtDateFull(copy.date)+') — statuses reset to To Do. Edit it in the morning.');
+}
+function deletePlan(){
+  const plan=currentPlan(); if(!plan) return;
+  if(!confirm('Delete this Daily Goal document? Its tasks and logged proof are kept on the board (unlinked), not deleted.')) return;
+  state.plans=state.plans.filter(p=>p.id!==plan.id);
+  state.tasks.forEach(t=>{ if(t.planId===plan.id){ delete t.planId; delete t.planItemId; } });
+  selectedPlanId=null; save(); renderAll(); showView('goal'); toast('Daily Goal document deleted (tasks/proof kept on board)');
+}
+function buildGoalText(plan, withProgress){
+  ensurePlanTasks(plan);
+  const ps=planStats(plan);
+  const mark=t=> !withProgress ? '' : (t.status==='done'?' [✅ Done]':t.status==='doing'?' [🔨 Doing]':' [⬜ To Do]');
+  let txt = plan.title+'\nDate: '+fmtDateFull(plan.date)+(withProgress?'\nProgress: '+ps.done+'/'+ps.total+' tasks done ('+ps.pct+'%)':'')+'\n\nOverall Objective:\n'+plan.overallObjective+'\n';
+  (plan.assignments||[]).forEach(a=>{
+    const d=devById(a.devId); const st=assignmentStats(plan,a);
+    txt += '\n'+d.name+' – '+a.area+(withProgress?'  ('+st.done+'/'+st.total+' done)':'')+'\n\nMain Goal:\n'+a.mainGoal+'\n\nTasks:\n';
+    (a.items||[]).forEach((item,i)=>{ const t=taskForItem(plan,a,item); txt += (i+1)+'. '+item.text+mark(t)+'\n'; });
+    txt += '\nExpected Deliverable:\n'+numberedExpectedDeliverableText(a.expectedDeliverable)+'\n';
+    if(withProgress){
+      const taskIds=new Set(st.tasks.map(t=>t.id));
+      const evidence=state.updates.filter(u=>taskIds.has(u.taskId)).sort((x,y)=>x.date.localeCompare(y.date));
+      txt += '\nActual Deliverable / Proof logged:\n';
+      if(!evidence.length) txt += '• No proof logged yet.\n';
+      evidence.forEach(u=>{ txt += '• ('+fmtDate(u.date)+', '+(u.hours||0)+'h) '+u.text+'\n'; if(u.demoLink) txt+='  🔗 Demo: '+u.demoLink+'\n'; if(u.githubLink) txt+='  💻 GitHub: '+u.githubLink+'\n'; if(u.screenshot) txt+='  🖼️ Screenshot: attached in ShipLog (What Was Built)\n'; if(u.blocker) txt+='  🚧 Blocker: '+u.blocker+'\n'; if(u.nextStep) txt+='  ➡️ Next: '+u.nextStep+'\n'; });
+    }
+  });
+  txt += '\n— ShipLog • '+state.project;
+  return txt;
+}
+function copyGoal(withProgress){
+  const plan=currentPlan(); if(!plan){ toast('No Daily Goal to copy'); return; }
+  const txt=buildGoalText(plan, withProgress);
+  navigator.clipboard?.writeText(txt).then(()=>toast(withProgress?'📋 Copied with progress + proof — paste to your boss':'📄 Clean Daily Goal document copied')).catch(()=>prompt('Copy this document:',txt));
+}
+function printGoal(){ showView('goal'); document.body.classList.add('print-goal'); setTimeout(()=>{ window.print(); document.body.classList.remove('print-goal'); },60); }
+
+/* ============ Boot ============ */
+function renderAll(){ if(!state.plans) state.plans=[]; ensureProjectInfo(); fillDevSelects(); renderDevTabs(); renderProjectPage(); renderGoal(); renderHeader(); }
+save(); renderAll();
+</script>
+</body>
+</html>
